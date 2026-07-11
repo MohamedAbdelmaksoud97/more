@@ -1,0 +1,365 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // users/{uid}: PII user profile with uid, name, email, phone, role,
+    // status, commissionType, commissionValue, timestamps, approval fields.
+    // products/{productId}: catalog item with name, description, price,
+    // optional costPrice, images, category, active, stock, audit timestamps.
+    // orders/{orderId}: customer PII, product selection, payment, scrap,
+    // workflow status, marketer/coordinator IDs, documents, commission, timeline.
+    // commissions/{commissionId}: orderId, marketerId, status, amount, timestamps.
+    // targets/{targetId}: marketerId, month, year, target/achieved/remaining.
+    // expenses/{expenseId}: admin-only amount/category/note/attachment.
+    // notifications/{notificationId}: recipient user/role, actor, entity link,
+    // read/action flags, timestamp.
+    // fcmTokens/{tokenId}: token, userId, role, updatedAt.
+    // imageRequests/{requestId}: productId, requesterId, status, notes.
+    // scrapReports/{scrapId}: orderId, marketerId, status, value, notes.
+    // audit_logs/{logId}: server-written audit trail; clients cannot write.
+    //
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isApproved() {
+      return isAuthenticated() && request.auth.token.status == 'APPROVED';
+    }
+
+    function role() {
+      return request.auth.token.role;
+    }
+
+    function isAdmin() {
+      return isApproved() && role() == 'admin';
+    }
+
+    function isCoordinator() {
+      return isApproved() && role() == 'coordinator';
+    }
+
+    function isMarketer() {
+      return isApproved() && role() == 'marketer';
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function hasOnlyAllowedFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+
+    function unchanged(fields) {
+      return request.resource.data.diff(resource.data).affectedKeys().hasAny(fields) == false;
+    }
+
+    function optionalString(field, maxSize) {
+      return !(field in request.resource.data) ||
+        (request.resource.data[field] is string && request.resource.data[field].size() <= maxSize);
+    }
+
+    function optionalUrl(field) {
+      return !(field in request.resource.data) ||
+        (request.resource.data[field] is string &&
+          request.resource.data[field].size() <= 500 &&
+          request.resource.data[field].matches('^https://.*'));
+    }
+
+    function validEmail(email) {
+      return email is string &&
+        email.size() <= 160 &&
+        email.matches('^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$');
+    }
+
+    function validRole(value) {
+      return value in ['admin', 'coordinator', 'marketer'];
+    }
+
+    function validUserStatus(value) {
+      return value in ['PENDING_EMAIL_VERIFICATION', 'PENDING_ADMIN_APPROVAL', 'PENDING', 'APPROVED', 'REJECTED', 'SUSPENDED'];
+    }
+
+    function validOrderStatus(value) {
+      return value in [
+        'DRAFT',
+        'PENDING_REVIEW',
+        'REJECTED',
+        'APPROVED_RESERVED',
+        'PREPARING_SHIPPING',
+        'SHIPPED',
+        'DELIVERED_PENDING_CONFIRMATION',
+        'PAYMENT_CONFIRMED',
+        'COMMISSION_PENDING',
+        'COMPLETED',
+        'FAILED_DELIVERY',
+        'RETURNED_PENDING_STOCK',
+        'RETURNED_TO_STOCK',
+        'CANCELLED'
+      ];
+    }
+
+    function validCommissionStatus(value) {
+      return value in ['EXPECTED', 'PENDING', 'APPROVED', 'PAID', 'CANCELLED', 'DEDUCTED'];
+    }
+
+    function validUser(data) {
+      return hasOnlyAllowedFields([
+          'uid',
+          'name',
+          'email',
+          'phone',
+          'role',
+          'status',
+          'fcmTokens',
+          'commissionType',
+          'commissionValue',
+          'createdAt',
+          'updatedAt',
+          'approvedBy',
+          'approvedAt'
+        ]) &&
+        hasRequiredFields(['uid', 'name', 'email', 'role', 'status', 'createdAt', 'updatedAt']) &&
+        data.uid is string &&
+        data.uid.size() <= 128 &&
+        data.name is string &&
+        data.name.size() >= 2 &&
+        data.name.size() <= 80 &&
+        validEmail(data.email) &&
+        validRole(data.role) &&
+        validUserStatus(data.status) &&
+        optionalString('phone', 20) &&
+        (!(data.commissionType is string) || data.commissionType in ['FIXED', 'PERCENTAGE']) &&
+        (!(data.commissionValue is number) || (data.commissionValue >= 0 && data.commissionValue <= 1000000));
+    }
+
+    function validProduct(data) {
+      return hasOnlyAllowedFields([
+          'name',
+          'description',
+          'price',
+          'costPrice',
+          'images',
+          'category',
+          'active',
+          'stock',
+          'createdBy',
+          'updatedBy',
+          'createdAt',
+          'updatedAt',
+          'deletedAt'
+        ]) &&
+        hasRequiredFields(['name', 'description', 'price', 'category', 'active', 'stock', 'createdBy', 'updatedBy', 'createdAt', 'updatedAt']) &&
+        data.name is string &&
+        data.name.size() >= 2 &&
+        data.name.size() <= 120 &&
+        data.description is string &&
+        data.description.size() <= 2000 &&
+        data.price is number &&
+        data.price > 0 &&
+        data.price <= 10000000 &&
+        (!(data.costPrice is number) || (data.costPrice >= 0 && data.costPrice <= 10000000)) &&
+        data.category is string &&
+        data.category.size() <= 80 &&
+        data.active is bool &&
+        data.images is list &&
+        data.images.size() <= 20 &&
+        data.stock is list &&
+        data.stock.size() == 3;
+    }
+
+    function validOrder(data) {
+      return hasOnlyAllowedFields([
+          'customer',
+          'productId',
+          'productName',
+          'quantity',
+          'selectedLocation',
+          'finalPrice',
+          'discount',
+          'payment',
+          'scrap',
+          'status',
+          'marketerId',
+          'marketerName',
+          'coordinatorId',
+          'rejectionReason',
+          'shippingBillUrl',
+          'deliveryReceiptByCoordinatorUrl',
+          'deliveryReceiptByMarketerUrl',
+          'collectedAmount',
+          'isPaymentCollected',
+          'commissionStatus',
+          'commissionAmount',
+          'timeline',
+          'createdAt',
+          'updatedAt'
+        ]) &&
+        hasRequiredFields(['customer', 'productId', 'quantity', 'selectedLocation', 'finalPrice', 'status', 'marketerId', 'isPaymentCollected', 'commissionStatus', 'commissionAmount', 'createdAt', 'updatedAt']) &&
+        data.customer is map &&
+        data.customer.customerName is string &&
+        data.customer.customerName.size() <= 100 &&
+        data.customer.customerPhone is string &&
+        data.customer.customerPhone.size() <= 20 &&
+        data.productId is string &&
+        data.productId.size() <= 128 &&
+        data.quantity is int &&
+        data.quantity > 0 &&
+        data.quantity <= 1000 &&
+        data.selectedLocation in ['SHOWROOM', 'WAREHOUSE', 'SUPPLIER_DIRECT'] &&
+        data.finalPrice is number &&
+        data.finalPrice > 0 &&
+        validOrderStatus(data.status) &&
+        data.marketerId is string &&
+        data.isPaymentCollected is bool &&
+        validCommissionStatus(data.commissionStatus) &&
+        data.commissionAmount is number &&
+        data.commissionAmount >= 0 &&
+        data.timeline is list &&
+        data.timeline.size() <= 80 &&
+        optionalUrl('shippingBillUrl') &&
+        optionalUrl('deliveryReceiptByCoordinatorUrl') &&
+        optionalUrl('deliveryReceiptByMarketerUrl');
+    }
+
+    function validNotification(data) {
+      return hasOnlyAllowedFields([
+          'title',
+          'body',
+          'type',
+          'recipientUserId',
+          'recipientRole',
+          'actorUserId',
+          'actorName',
+          'relatedEntityType',
+          'relatedEntityId',
+          'isRead',
+          'requiresAction',
+          'createdAt'
+        ]) &&
+        hasRequiredFields(['title', 'body', 'type', 'actorUserId', 'actorName', 'isRead', 'requiresAction', 'createdAt']) &&
+        data.title is string &&
+        data.title.size() <= 120 &&
+        data.body is string &&
+        data.body.size() <= 500 &&
+        data.type is string &&
+        data.type.size() <= 80 &&
+        (!(data.recipientRole is string) || validRole(data.recipientRole)) &&
+        data.isRead is bool &&
+        data.requiresAction is bool;
+    }
+
+    match /users/{userId} {
+      allow read: if isAdmin() || isOwner(userId);
+      allow create: if isAuthenticated() &&
+        isOwner(userId) &&
+        validUser(request.resource.data) &&
+        request.resource.data.role == 'marketer' &&
+        request.resource.data.status == 'PENDING';
+      allow update: if isAdmin() && validUser(request.resource.data) && request.resource.data.uid == resource.data.uid;
+      allow delete: if isAdmin() && userId != request.auth.uid;
+    }
+
+    match /products/{productId} {
+      allow read: if isApproved();
+      allow create: if (isAdmin() || isCoordinator()) && validProduct(request.resource.data);
+      allow update: if (isAdmin() || isCoordinator()) &&
+        validProduct(request.resource.data) &&
+        unchanged(['createdBy', 'createdAt']);
+      allow delete: if isAdmin();
+    }
+
+    match /orders/{orderId} {
+      allow read: if isAdmin() || isCoordinator() || (isMarketer() && resource.data.marketerId == request.auth.uid);
+      allow create: if (isMarketer() || isAdmin()) &&
+        validOrder(request.resource.data) &&
+        request.resource.data.marketerId == request.auth.uid &&
+        request.resource.data.status == 'PENDING_REVIEW' &&
+        request.resource.data.commissionStatus == 'EXPECTED';
+      allow update: if (
+          (isAdmin() || isCoordinator()) ||
+          (isMarketer() &&
+            resource.data.marketerId == request.auth.uid &&
+            request.resource.data.marketerId == resource.data.marketerId &&
+            request.resource.data.diff(resource.data).affectedKeys().hasOnly(['deliveryReceiptByMarketerUrl', 'updatedAt', 'timeline']))
+        ) &&
+        validOrder(request.resource.data) &&
+        unchanged(['createdAt', 'marketerId', 'productId', 'quantity', 'selectedLocation']);
+      allow delete: if isAdmin();
+    }
+
+    match /commissions/{commissionId} {
+      allow read: if isAdmin() || (isMarketer() && resource.data.marketerId == request.auth.uid);
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /targets/{targetId} {
+      allow read: if isAdmin() || (isMarketer() && resource.data.marketerId == request.auth.uid);
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /expenses/{expenseId} {
+      allow read, create, update, delete: if isAdmin();
+    }
+
+    match /notifications/{notificationId} {
+      allow read: if isAdmin() ||
+        (isApproved() && resource.data.recipientUserId == request.auth.uid) ||
+        (isApproved() && resource.data.recipientRole == role());
+      allow create: if isAdmin() || isCoordinator();
+      allow update: if validNotification(request.resource.data) &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['isRead']) &&
+        (
+          isAdmin() ||
+          resource.data.recipientUserId == request.auth.uid ||
+          resource.data.recipientRole == role()
+        );
+      allow delete: if isAdmin();
+    }
+
+    match /fcmTokens/{tokenId} {
+      allow read: if isAdmin();
+      allow create, update: if isApproved() &&
+        request.resource.data.userId == request.auth.uid &&
+        request.resource.data.token is string &&
+        request.resource.data.token.size() <= 4096 &&
+        request.resource.data.role == role();
+      allow delete: if isAdmin() || (isApproved() && resource.data.userId == request.auth.uid);
+    }
+
+    match /imageRequests/{requestId} {
+      allow read: if isAdmin() || isCoordinator() || (isMarketer() && resource.data.requesterId == request.auth.uid);
+      allow create: if isApproved() &&
+        request.resource.data.requesterId == request.auth.uid &&
+        request.resource.data.productId is string &&
+        request.resource.data.productId.size() <= 128;
+      allow update, delete: if isAdmin() || isCoordinator();
+    }
+
+    match /scrapReports/{scrapId} {
+      allow read: if isAdmin() || isCoordinator() || (isMarketer() && resource.data.marketerId == request.auth.uid);
+      allow create: if isMarketer() && request.resource.data.marketerId == request.auth.uid;
+      allow update, delete: if isAdmin() || isCoordinator();
+    }
+
+    match /audit_logs/{logId} {
+      allow read: if isAdmin();
+      allow create, update, delete: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

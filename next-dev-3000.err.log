@@ -1,0 +1,601 @@
+[browser] A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+
+  ...
+    <HotReload globalError={[...]} webSocket={WebSocket} staticIndicatorState={{pathname:null, ...}}>
+      <AppDevOverlayErrorBoundary globalError={[...]}>
+        <ReplaySsrOnlyErrors>
+        <DevRootHTTPAccessFallbackBoundary>
+          <HTTPAccessFallbackBoundary notFound={<NotAllowedRootHTTPFallbackError>}>
+            <HTTPAccessFallbackErrorBoundary pathname="/marketer/..." notFound={<NotAllowedRootHTTPFallbackError>} ...>
+              <RedirectBoundary>
+                <RedirectErrorBoundary router={{...}}>
+                  <Head>
+                  <__next_root_layout_boundary__>
+                    <LoadingBoundaryProvider loading={[...]}>
+                      <SegmentViewNode type="layout" pagePath="layout.tsx">
+                        <SegmentTrieNode>
+                        <link>
+                        <script>
+                        <script>
+                        <script>
+                        <RootLayout>
+                          <html
+                            lang="ar"
+                            dir="rtl"
+                            className="ibm_plex_sans_arabic_e55231aa-module__qynrWa__variable h-full antialiased"
+-                           suppresshydrationwarning="true"
+-                           data-lt-installed="true"
+                          >
+                  ...
+ 
+[browser] A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+
+  ...
+    <HotReload globalError={[...]} webSocket={WebSocket} staticIndicatorState={{pathname:null, ...}}>
+      <AppDevOverlayErrorBoundary globalError={[...]}>
+        <ReplaySsrOnlyErrors>
+        <DevRootHTTPAccessFallbackBoundary>
+          <HTTPAccessFallbackBoundary notFound={<NotAllowedRootHTTPFallbackError>}>
+            <HTTPAccessFallbackErrorBoundary pathname="/login" notFound={<NotAllowedRootHTTPFallbackError>} ...>
+              <RedirectBoundary>
+                <RedirectErrorBoundary router={{...}}>
+                  <Head>
+                  <__next_root_layout_boundary__>
+                    <LoadingBoundaryProvider loading={[...]}>
+                      <SegmentViewNode type="layout" pagePath="layout.tsx">
+                        <SegmentTrieNode>
+                        <link>
+                        <script>
+                        <script>
+                        <script>
+                        <RootLayout>
+                          <html
+                            lang="ar"
+                            dir="rtl"
+                            className="ibm_plex_sans_arabic_e55231aa-module__qynrWa__variable h-full antialiased"
+-                           suppresshydrationwarning="true"
+-                           data-lt-installed="true"
+                          >
+                            <body
+                              className="min-h-full bg-slate-100"
+-                             cz-shortcut-listen="true"
+                            >
+                  ...
+ 
+[browser] A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+
+  ...
+    <HotReload globalError={[...]} webSocket={WebSocket} staticIndicatorState={{pathname:null, ...}}>
+      <AppDevOverlayErrorBoundary globalError={[...]}>
+        <ReplaySsrOnlyErrors>
+        <DevRootHTTPAccessFallbackBoundary>
+          <HTTPAccessFallbackBoundary notFound={<NotAllowedRootHTTPFallbackError>}>
+            <HTTPAccessFallbackErrorBoundary pathname="/login" notFound={<NotAllowedRootHTTPFallbackError>} ...>
+              <RedirectBoundary>
+                <RedirectErrorBoundary router={{...}}>
+                  <Head>
+                  <__next_root_layout_boundary__>
+                    <LoadingBoundaryProvider loading={[...]}>
+                      <SegmentViewNode type="layout" pagePath="layout.tsx">
+                        <SegmentTrieNode>
+                        <link>
+                        <script>
+                        <script>
+                        <script>
+                        <RootLayout>
+                          <html lang="ar" dir="rtl" className="ibm_plex_s..." suppressHydrationWarning={true}>
+                            <body
+                              className="min-h-full bg-slate-100"
+-                             cz-shortcut-listen="true"
+                            >
+                  ...
+ 
+⚠ Fast Refresh had to perform a full reload when ./node_modules/next/dist/client/image-component.js changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+[browser] A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+
+  ...
+    <HotReload globalError={[...]} webSocket={WebSocket} staticIndicatorState={{pathname:null, ...}}>
+      <AppDevOverlayErrorBoundary globalError={[...]}>
+        <ReplaySsrOnlyErrors>
+        <DevRootHTTPAccessFallbackBoundary>
+          <HTTPAccessFallbackBoundary notFound={<NotAllowedRootHTTPFallbackError>}>
+            <HTTPAccessFallbackErrorBoundary pathname="/notificat..." notFound={<NotAllowedRootHTTPFallbackError>} ...>
+              <RedirectBoundary>
+                <RedirectErrorBoundary router={{...}}>
+                  <Head>
+                  <__next_root_layout_boundary__>
+                    <LoadingBoundaryProvider loading={[...]}>
+                      <SegmentViewNode type="layout" pagePath="layout.tsx">
+                        <SegmentTrieNode>
+                        <link>
+                        <script>
+                        <script>
+                        <script>
+                        <RootLayout>
+                          <html lang="ar" dir="rtl" className="ibm_plex_s..." suppressHydrationWarning={true}>
+                            <body
+                              className="min-h-full bg-slate-100"
+-                             cz-shortcut-listen="true"
+                            >
+                  ...
+ 
+[browser] React instrumentation encountered an error: 'Error: The children should not have changed if we pass in the same set.\n' +
+  '    at updateFiberRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:121140)\n' +
+  '    at updateVirtualChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116568)\n' +
+  '    at updateChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116917)\n' +
+  '    at updateFiberRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:120463)\n' +
+  '    at updateVirtualChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116568)\n' +
+  '    at updateChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116917)\n' +
+  '    at updateFiberRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:120463)\n' +
+  '    at updateVirtualChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116568)\n' +
+  '    at updateChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116917)\n' +
+  '    at updateFiberRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:120463)\n' +
+  '    at updateVirtualChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116478)\n' +
+  '    at updateVirtualInstanceRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:115002)\n' +
+  '    at updateVirtualChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116771)\n' +
+  '    at updateVirtualInstanceRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:115002)\n' +
+  '    at updateVirtualChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116771)\n' +
+  '    at updateChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116917)\n' +
+  '    at updateFiberRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:120463)\n' +
+  '    at updateVirtualChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116478)\n' +
+  '    at updateChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116917)\n' +
+  '    at updateFiberRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:120463)\n' +
+  '    at updateVirtualChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116478)\n' +
+  '    at updateChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116917)\n' +
+  '    at updateFiberRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:120463)\n' +
+  '    at updateVirtualChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116478)\n' +
+  '    at updateChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116917)\n' +
+  '    at updateFiberRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:120463)\n' +
+  '    at updateVirtualChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116478)\n' +
+  '    at updateChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116917)\n' +
+  '    at updateFiberRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:120463)\n' +
+  '    at updateVirtualChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116478)\n' +
+  '    at updateChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116917)\n' +
+  '    at updateFiberRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:120463)\n' +
+  '    at updateVirtualChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116478)\n' +
+  '    at updateChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116917)\n' +
+  '    at updateFiberRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:120463)\n' +
+  '    at updateVirtualChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116478)\n' +
+  '    at updateChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116917)\n' +
+  '    at updateFiberRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:120463)\n' +
+  '    at updateVirtualChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116478)\n' +
+  '    at updateChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116917)\n' +
+  '    at updateFiberRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:120463)\n' +
+  '    at updateVirtualChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116478)\n' +
+  '    at updateChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116917)\n' +
+  '    at updateFiberRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:120463)\n' +
+  '    at updateVirtualChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116478)\n' +
+  '    at <unknown> (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:119825)\n' +
+  '    at updateFiberRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:120024)\n' +
+  '    at updateVirtualChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116478)\n' +
+  '    at updateChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116917)\n' +
+  '    at updateFiberRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:120463)' (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:86461)
+[browser] A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+
+  ...
+    <HotReload globalError={[...]} webSocket={WebSocket} staticIndicatorState={{pathname:null, ...}}>
+      <AppDevOverlayErrorBoundary globalError={[...]}>
+        <ReplaySsrOnlyErrors>
+        <DevRootHTTPAccessFallbackBoundary>
+          <HTTPAccessFallbackBoundary notFound={<NotAllowedRootHTTPFallbackError>}>
+            <HTTPAccessFallbackErrorBoundary pathname="/admin/das..." notFound={<NotAllowedRootHTTPFallbackError>} ...>
+              <RedirectBoundary>
+                <RedirectErrorBoundary router={{...}}>
+                  <Head>
+                  <__next_root_layout_boundary__>
+                    <LoadingBoundaryProvider loading={[...]}>
+                      <SegmentViewNode type="layout" pagePath="layout.tsx">
+                        <SegmentTrieNode>
+                        <link>
+                        <script>
+                        <script>
+                        <script>
+                        <RootLayout>
+                          <html lang="ar" dir="rtl" className="ibm_plex_s..." suppressHydrationWarning={true}>
+                            <body
+                              className="min-h-full bg-slate-100"
+-                             cz-shortcut-listen="true"
+                            >
+                  ...
+ 
+[browser] React instrumentation encountered an error: 'Error: The children should not have changed if we pass in the same set.\n' +
+  '    at updateFiberRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:121140)\n' +
+  '    at updateVirtualChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116568)\n' +
+  '    at updateChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116917)\n' +
+  '    at updateFiberRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:120463)\n' +
+  '    at updateVirtualChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116568)\n' +
+  '    at updateChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116917)\n' +
+  '    at updateFiberRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:120463)\n' +
+  '    at updateVirtualChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116568)\n' +
+  '    at updateChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116917)\n' +
+  '    at updateFiberRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:120463)\n' +
+  '    at updateVirtualChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116478)\n' +
+  '    at updateVirtualInstanceRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:115002)\n' +
+  '    at updateVirtualChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116771)\n' +
+  '    at updateVirtualInstanceRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:115002)\n' +
+  '    at updateVirtualChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116771)\n' +
+  '    at updateChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116917)\n' +
+  '    at updateFiberRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:120463)\n' +
+  '    at updateVirtualChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116478)\n' +
+  '    at updateChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116917)\n' +
+  '    at updateFiberRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:120463)\n' +
+  '    at updateVirtualChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116478)\n' +
+  '    at updateChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116917)\n' +
+  '    at updateFiberRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:120463)\n' +
+  '    at updateVirtualChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116478)\n' +
+  '    at updateChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116917)\n' +
+  '    at updateFiberRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:120463)\n' +
+  '    at updateVirtualChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116478)\n' +
+  '    at updateChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116917)\n' +
+  '    at updateFiberRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:120463)\n' +
+  '    at updateVirtualChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116478)\n' +
+  '    at updateChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116917)\n' +
+  '    at updateFiberRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:120463)\n' +
+  '    at updateVirtualChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116478)\n' +
+  '    at updateChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116917)\n' +
+  '    at updateFiberRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:120463)\n' +
+  '    at updateVirtualChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116478)\n' +
+  '    at updateChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116917)\n' +
+  '    at updateFiberRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:120463)\n' +
+  '    at updateVirtualChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116478)\n' +
+  '    at updateChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116917)\n' +
+  '    at updateFiberRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:120463)\n' +
+  '    at updateVirtualChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116478)\n' +
+  '    at updateChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116917)\n' +
+  '    at updateFiberRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:120463)\n' +
+  '    at updateVirtualChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116478)\n' +
+  '    at <unknown> (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:119825)\n' +
+  '    at updateFiberRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:120024)\n' +
+  '    at updateVirtualChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116478)\n' +
+  '    at updateChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116917)\n' +
+  '    at updateFiberRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:120463)' (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:86461)
+⨯ Error: Value for argument "data" is not a valid Firestore document. Cannot use "undefined" as a Firestore value (found in field "payment.depositImageUrl"). If you want to ignore undefined values, enable `ignoreUndefinedProperties`.
+    at createOrderAction (lib\actions\order-actions.ts:106:45)
+  104 |   };
+  105 |
+> 106 |   const ref = await db.collection("orders").add(order);
+      |                                             ^
+  107 |   await writeAudit({
+  108 |     actorUserId: user.uid,
+  109 |     actorRole: user.role, {
+  digest: '1097301157'
+}
+⨯ Error: Value for argument "data" is not a valid Firestore document. Cannot use "undefined" as a Firestore value (found in field "payment.depositImageUrl"). If you want to ignore undefined values, enable `ignoreUndefinedProperties`.
+    at createOrderAction (lib\actions\order-actions.ts:106:45)
+  104 |   };
+  105 |
+> 106 |   const ref = await db.collection("orders").add(order);
+      |                                             ^
+  107 |   await writeAudit({
+  108 |     actorUserId: user.uid,
+  109 |     actorRole: user.role, {
+  digest: '1097301157'
+}
+[browser] A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+
+  ...
+    <HotReload globalError={[...]} webSocket={WebSocket} staticIndicatorState={{pathname:null, ...}}>
+      <AppDevOverlayErrorBoundary globalError={[...]}>
+        <ReplaySsrOnlyErrors>
+        <DevRootHTTPAccessFallbackBoundary>
+          <HTTPAccessFallbackBoundary notFound={<NotAllowedRootHTTPFallbackError>}>
+            <HTTPAccessFallbackErrorBoundary pathname="/admin/pro..." notFound={<NotAllowedRootHTTPFallbackError>} ...>
+              <RedirectBoundary>
+                <RedirectErrorBoundary router={{...}}>
+                  <Head>
+                  <__next_root_layout_boundary__>
+                    <LoadingBoundaryProvider loading={[...]}>
+                      <SegmentViewNode type="layout" pagePath="layout.tsx">
+                        <SegmentTrieNode>
+                        <link>
+                        <script>
+                        <script>
+                        <script>
+                        <RootLayout>
+                          <html lang="ar" dir="rtl" className="ibm_plex_s..." suppressHydrationWarning={true}>
+                            <body
+                              className="min-h-full bg-slate-100"
+-                             cz-shortcut-listen="true"
+                            >
+                  ...
+ 
+⚠ Fast Refresh had to perform a full reload when ./node_modules/next/dist/client/image-component.js changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+[browser] A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+
+  ...
+    <HotReload globalError={[...]} webSocket={WebSocket} staticIndicatorState={{pathname:null, ...}}>
+      <AppDevOverlayErrorBoundary globalError={[...]}>
+        <ReplaySsrOnlyErrors>
+        <DevRootHTTPAccessFallbackBoundary>
+          <HTTPAccessFallbackBoundary notFound={<NotAllowedRootHTTPFallbackError>}>
+            <HTTPAccessFallbackErrorBoundary pathname="/admin/das..." notFound={<NotAllowedRootHTTPFallbackError>} ...>
+              <RedirectBoundary>
+                <RedirectErrorBoundary router={{...}}>
+                  <Head>
+                  <__next_root_layout_boundary__>
+                    <LoadingBoundaryProvider loading={[...]}>
+                      <SegmentViewNode type="layout" pagePath="layout.tsx">
+                        <SegmentTrieNode>
+                        <link>
+                        <script>
+                        <script>
+                        <script>
+                        <RootLayout>
+                          <html lang="ar" dir="rtl" className="ibm_plex_s..." suppressHydrationWarning={true}>
+                            <body
+                              className="min-h-full bg-slate-100"
+-                             cz-shortcut-listen="true"
+                            >
+                  ...
+ 
+[browser] A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+
+  ...
+    <HotReload globalError={[...]} webSocket={WebSocket} staticIndicatorState={{pathname:null, ...}}>
+      <AppDevOverlayErrorBoundary globalError={[...]}>
+        <ReplaySsrOnlyErrors>
+        <DevRootHTTPAccessFallbackBoundary>
+          <HTTPAccessFallbackBoundary notFound={<NotAllowedRootHTTPFallbackError>}>
+            <HTTPAccessFallbackErrorBoundary pathname="/admin/das..." notFound={<NotAllowedRootHTTPFallbackError>} ...>
+              <RedirectBoundary>
+                <RedirectErrorBoundary router={{...}}>
+                  <Head>
+                  <__next_root_layout_boundary__>
+                    <LoadingBoundaryProvider loading={[...]}>
+                      <SegmentViewNode type="layout" pagePath="layout.tsx">
+                        <SegmentTrieNode>
+                        <link>
+                        <script>
+                        <script>
+                        <script>
+                        <RootLayout>
+                          <html lang="ar" dir="rtl" className="ibm_plex_s..." suppressHydrationWarning={true}>
+                            <body
+                              className="min-h-full bg-slate-100"
+-                             cz-shortcut-listen="true"
+                            >
+                  ...
+ 
+⨯ Error: Value for argument "data" is not a valid Firestore document. Cannot use "undefined" as a Firestore value (found in field "payment.depositImageUrl"). If you want to ignore undefined values, enable `ignoreUndefinedProperties`.
+    at createOrderAction (lib\actions\order-actions.ts:119:45)
+  117 |   };
+  118 |
+> 119 |   const ref = await db.collection("orders").add(order);
+      |                                             ^
+  120 |   await writeAudit({
+  121 |     actorUserId: user.uid,
+  122 |     actorRole: user.role, {
+  digest: '1827859176'
+}
+[browser] A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+
+  ...
+    <HotReload globalError={[...]} webSocket={WebSocket} staticIndicatorState={{pathname:null, ...}}>
+      <AppDevOverlayErrorBoundary globalError={[...]}>
+        <ReplaySsrOnlyErrors>
+        <DevRootHTTPAccessFallbackBoundary>
+          <HTTPAccessFallbackBoundary notFound={<NotAllowedRootHTTPFallbackError>}>
+            <HTTPAccessFallbackErrorBoundary pathname="/admin/orders" notFound={<NotAllowedRootHTTPFallbackError>} ...>
+              <RedirectBoundary>
+                <RedirectErrorBoundary router={{...}}>
+                  <Head>
+                  <__next_root_layout_boundary__>
+                    <LoadingBoundaryProvider loading={[...]}>
+                      <SegmentViewNode type="layout" pagePath="layout.tsx">
+                        <SegmentTrieNode>
+                        <link>
+                        <script>
+                        <script>
+                        <script>
+                        <RootLayout>
+                          <html lang="ar" dir="rtl" className="ibm_plex_s..." suppressHydrationWarning={true}>
+                            <body
+                              className="min-h-full bg-slate-100"
+-                             cz-shortcut-listen="true"
+                            >
+                  ...
+ 
+[browser] A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+
+  ...
+    <HotReload globalError={[...]} webSocket={WebSocket} staticIndicatorState={{pathname:null, ...}}>
+      <AppDevOverlayErrorBoundary globalError={[...]}>
+        <ReplaySsrOnlyErrors>
+        <DevRootHTTPAccessFallbackBoundary>
+          <HTTPAccessFallbackBoundary notFound={<NotAllowedRootHTTPFallbackError>}>
+            <HTTPAccessFallbackErrorBoundary pathname="/admin/ord..." notFound={<NotAllowedRootHTTPFallbackError>} ...>
+              <RedirectBoundary>
+                <RedirectErrorBoundary router={{...}}>
+                  <Head>
+                  <__next_root_layout_boundary__>
+                    <LoadingBoundaryProvider loading={[...]}>
+                      <SegmentViewNode type="layout" pagePath="layout.tsx">
+                        <SegmentTrieNode>
+                        <link>
+                        <script>
+                        <script>
+                        <script>
+                        <RootLayout>
+                          <html lang="ar" dir="rtl" className="ibm_plex_s..." suppressHydrationWarning={true}>
+                            <body
+                              className="min-h-full bg-slate-100"
+-                             cz-shortcut-listen="true"
+                            >
+                  ...
+ 
+[browser] A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+
+  ...
+    <HotReload globalError={[...]} webSocket={WebSocket} staticIndicatorState={{pathname:null, ...}}>
+      <AppDevOverlayErrorBoundary globalError={[...]}>
+        <ReplaySsrOnlyErrors>
+        <DevRootHTTPAccessFallbackBoundary>
+          <HTTPAccessFallbackBoundary notFound={<NotAllowedRootHTTPFallbackError>}>
+            <HTTPAccessFallbackErrorBoundary pathname="/admin/ord..." notFound={<NotAllowedRootHTTPFallbackError>} ...>
+              <RedirectBoundary>
+                <RedirectErrorBoundary router={{...}}>
+                  <Head>
+                  <__next_root_layout_boundary__>
+                    <LoadingBoundaryProvider loading={[...]}>
+                      <SegmentViewNode type="layout" pagePath="layout.tsx">
+                        <SegmentTrieNode>
+                        <link>
+                        <script>
+                        <script>
+                        <script>
+                        <RootLayout>
+                          <html lang="ar" dir="rtl" className="ibm_plex_s..." suppressHydrationWarning={true}>
+                            <body
+                              className="min-h-full bg-slate-100"
+-                             cz-shortcut-listen="true"
+                            >
+                  ...
+ 
+[browser] A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+
+  ...
+    <HotReload globalError={[...]} webSocket={WebSocket} staticIndicatorState={{pathname:null, ...}}>
+      <AppDevOverlayErrorBoundary globalError={[...]}>
+        <ReplaySsrOnlyErrors>
+        <DevRootHTTPAccessFallbackBoundary>
+          <HTTPAccessFallbackBoundary notFound={<NotAllowedRootHTTPFallbackError>}>
+            <HTTPAccessFallbackErrorBoundary pathname="/admin/ord..." notFound={<NotAllowedRootHTTPFallbackError>} ...>
+              <RedirectBoundary>
+                <RedirectErrorBoundary router={{...}}>
+                  <Head>
+                  <__next_root_layout_boundary__>
+                    <LoadingBoundaryProvider loading={[...]}>
+                      <SegmentViewNode type="layout" pagePath="layout.tsx">
+                        <SegmentTrieNode>
+                        <link>
+                        <script>
+                        <script>
+                        <script>
+                        <RootLayout>
+                          <html lang="ar" dir="rtl" className="ibm_plex_s..." suppressHydrationWarning={true}>
+                            <body
+                              className="min-h-full bg-slate-100"
+-                             cz-shortcut-listen="true"
+                            >
+                  ...
+ 

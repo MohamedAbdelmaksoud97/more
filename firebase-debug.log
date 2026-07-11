@@ -1,0 +1,111 @@
+[debug] [2026-07-11T08:42:45.724Z] ----------------------------------------------------------------------
+[debug] [2026-07-11T08:42:45.726Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\MF\AppData\Local\npm-cache\_npx\ba4f1959e38407b5\node_modules\firebase-tools\lib\bin\firebase.js deploy --only firestore:rules --dry-run --project more-bc759
+[debug] [2026-07-11T08:42:45.726Z] CLI Version:   15.23.0
+[debug] [2026-07-11T08:42:45.726Z] Platform:      win32
+[debug] [2026-07-11T08:42:45.726Z] Node Version:  v24.11.0
+[debug] [2026-07-11T08:42:45.727Z] Detected Agent: codex_cli
+[debug] [2026-07-11T08:42:45.727Z] Time:          Sat Jul 11 2026 11:42:45 GMT+0300 (Eastern European Summer Time)
+[debug] [2026-07-11T08:42:45.727Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-07-11T08:42:45.738Z] >>> [apiv2][query] GET https://firebase-public.firebaseio.com/cli.json [none]
+[debug] [2026-07-11T08:42:48.946Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-07-11T08:42:49.635Z] Running auto auth
+[debug] [2026-07-11T08:42:49.636Z] [iam] checking project more-bc759 for permissions ["datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get"]
+[debug] [2026-07-11T08:42:49.637Z] No OAuth tokens found
+[debug] [2026-07-11T08:42:49.637Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/more-bc759:testIamPermissions [none]
+[debug] [2026-07-11T08:42:49.637Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/more-bc759:testIamPermissions  x-goog-user-project=more-bc759
+[debug] [2026-07-11T08:42:49.638Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/more-bc759:testIamPermissions {"permissions":["datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get"]}
+[debug] [2026-07-11T08:42:49.650Z] <<< [apiv2][status] GET https://firebase-public.firebaseio.com/cli.json 200
+[debug] [2026-07-11T08:42:49.650Z] <<< [apiv2][body] GET https://firebase-public.firebaseio.com/cli.json {"cloudBuildErrorAfter":1594252800000,"cloudBuildWarnAfter":1590019200000,"defaultNode10After":1594252800000,"minVersion":"3.0.5","node8DeploysDisabledAfter":1613390400000,"node8RuntimeDisabledAfter":1615809600000,"node8WarnAfter":1600128000000}
+[debug] [2026-07-11T08:42:50.855Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/more-bc759:testIamPermissions 200
+[debug] [2026-07-11T08:42:50.855Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/more-bc759:testIamPermissions {"permissions":["datastore.indexes.list","firebase.projects.get"]}
+[debug] [2026-07-11T08:42:50.856Z] [iam] error while checking permissions, command may fail: Authorization failed. This account is missing the following required permissions on project more-bc759:
+
+  datastore.indexes.create
+  datastore.indexes.delete
+  datastore.indexes.update
+[info] 
+[info] === Deploying to 'more-bc759'...
+[info] 
+[info] i  deploying firestore 
+[info] i  firestore: ensuring required API firestore.googleapis.com is enabled... 
+[debug] [2026-07-11T08:42:50.860Z] No OAuth tokens found
+[debug] [2026-07-11T08:42:50.861Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/more-bc759/services/firestore.googleapis.com [none]
+[debug] [2026-07-11T08:42:50.861Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/more-bc759/services/firestore.googleapis.com  x-goog-user-project=more-bc759
+[debug] [2026-07-11T08:42:52.066Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/more-bc759/services/firestore.googleapis.com 403
+[debug] [2026-07-11T08:42:52.066Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/more-bc759/services/firestore.googleapis.com [omitted]
+[error] 
+[error] Error: Request to https://serviceusage.googleapis.com/v1/projects/more-bc759/services/firestore.googleapis.com had HTTP Error: 403, Permission denied to get service [firestore.googleapis.com]
+Help Token: AdZh9Gdxl22dzAB-Ks9X14D8XP7ezzAXiBLbfJ3Cfb7Ljg-Fot9w1hdeki3rDyJ-prbJ7USvxGrN9Mco5OrgcOlTwTQcLIJfch9LAo0zmq5S-h4b
+[debug] [2026-07-11T08:42:52.069Z] Error Context: {
+  "body": {
+    "error": {
+      "code": 403,
+      "message": "Permission denied to get service [firestore.googleapis.com]\nHelp Token: AdZh9Gdxl22dzAB-Ks9X14D8XP7ezzAXiBLbfJ3Cfb7Ljg-Fot9w1hdeki3rDyJ-prbJ7USvxGrN9Mco5OrgcOlTwTQcLIJfch9LAo0zmq5S-h4b",
+      "status": "PERMISSION_DENIED",
+      "details": [
+        {
+          "@type": "type.googleapis.com/google.rpc.PreconditionFailure",
+          "violations": [
+            {
+              "type": "googleapis.com",
+              "subject": "110002"
+            }
+          ]
+        },
+        {
+          "@type": "type.googleapis.com/google.rpc.ErrorInfo",
+          "reason": "AUTH_PERMISSION_DENIED",
+          "domain": "serviceusage.googleapis.com"
+        }
+      ]
+    }
+  },
+  "response": {
+    "statusCode": 403
+  }
+}
+[debug] [2026-07-11T10:20:00.235Z] ----------------------------------------------------------------------
+[debug] [2026-07-11T10:20:00.244Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\MF\AppData\Local\npm-cache\_npx\ba4f1959e38407b5\node_modules\firebase-tools\lib\bin\firebase.js firestore:databases:list --project more-bc759
+[debug] [2026-07-11T10:20:00.245Z] CLI Version:   15.23.0
+[debug] [2026-07-11T10:20:00.246Z] Platform:      win32
+[debug] [2026-07-11T10:20:00.246Z] Node Version:  v24.11.0
+[debug] [2026-07-11T10:20:00.246Z] Detected Agent: codex_cli
+[debug] [2026-07-11T10:20:00.247Z] Time:          Sat Jul 11 2026 13:20:00 GMT+0300 (Eastern European Summer Time)
+[debug] [2026-07-11T10:20:00.247Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-07-11T10:20:11.288Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-07-11T10:20:11.414Z] Error: Could not load the default credentials. Browse to https://cloud.google.com/docs/authentication/getting-started for more information.
+    at GoogleAuth.getApplicationDefaultAsync (C:\Users\MF\AppData\Local\npm-cache\_npx\ba4f1959e38407b5\node_modules\google-auth-library\build\src\auth\googleauth.js:287:15)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async GoogleAuth._GoogleAuth_determineClient (C:\Users\MF\AppData\Local\npm-cache\_npx\ba4f1959e38407b5\node_modules\google-auth-library\build\src\auth\googleauth.js:834:32)
+    at async GoogleAuth.getClient (C:\Users\MF\AppData\Local\npm-cache\_npx\ba4f1959e38407b5\node_modules\google-auth-library\build\src\auth\googleauth.js:698:20)
+    at async GoogleAuth.getAccessToken (C:\Users\MF\AppData\Local\npm-cache\_npx\ba4f1959e38407b5\node_modules\google-auth-library\build\src\auth\googleauth.js:722:24)
+    at async autoAuth (C:\Users\MF\AppData\Local\npm-cache\_npx\ba4f1959e38407b5\node_modules\firebase-tools\lib\requireAuth.js:38:19)
+    at async requireAuth (C:\Users\MF\AppData\Local\npm-cache\_npx\ba4f1959e38407b5\node_modules\firebase-tools\lib\requireAuth.js:100:20)
+    at async Object.requirePermissions [as fn] (C:\Users\MF\AppData\Local\npm-cache\_npx\ba4f1959e38407b5\node_modules\firebase-tools\lib\requirePermissions.js:17:5)
+    at async C:\Users\MF\AppData\Local\npm-cache\_npx\ba4f1959e38407b5\node_modules\firebase-tools\lib\command.js:278:17
+[error] 
+[error] Error: Failed to authenticate, have you run firebase login?
+[debug] [2026-07-11T10:52:29.118Z] ----------------------------------------------------------------------
+[debug] [2026-07-11T10:52:29.124Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\MF\AppData\Local\npm-cache\_npx\ba4f1959e38407b5\node_modules\firebase-tools\lib\bin\firebase.js firestore:databases:list --project more-bc759
+[debug] [2026-07-11T10:52:29.125Z] CLI Version:   15.23.0
+[debug] [2026-07-11T10:52:29.125Z] Platform:      win32
+[debug] [2026-07-11T10:52:29.125Z] Node Version:  v24.11.0
+[debug] [2026-07-11T10:52:29.125Z] Detected Agent: codex_cli
+[debug] [2026-07-11T10:52:29.126Z] Time:          Sat Jul 11 2026 13:52:29 GMT+0300 (Eastern European Summer Time)
+[debug] [2026-07-11T10:52:29.126Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-07-11T10:52:34.157Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-07-11T10:52:34.283Z] Error: Could not load the default credentials. Browse to https://cloud.google.com/docs/authentication/getting-started for more information.
+    at GoogleAuth.getApplicationDefaultAsync (C:\Users\MF\AppData\Local\npm-cache\_npx\ba4f1959e38407b5\node_modules\google-auth-library\build\src\auth\googleauth.js:287:15)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async GoogleAuth._GoogleAuth_determineClient (C:\Users\MF\AppData\Local\npm-cache\_npx\ba4f1959e38407b5\node_modules\google-auth-library\build\src\auth\googleauth.js:834:32)
+    at async GoogleAuth.getClient (C:\Users\MF\AppData\Local\npm-cache\_npx\ba4f1959e38407b5\node_modules\google-auth-library\build\src\auth\googleauth.js:698:20)
+    at async GoogleAuth.getAccessToken (C:\Users\MF\AppData\Local\npm-cache\_npx\ba4f1959e38407b5\node_modules\google-auth-library\build\src\auth\googleauth.js:722:24)
+    at async autoAuth (C:\Users\MF\AppData\Local\npm-cache\_npx\ba4f1959e38407b5\node_modules\firebase-tools\lib\requireAuth.js:38:19)
+    at async requireAuth (C:\Users\MF\AppData\Local\npm-cache\_npx\ba4f1959e38407b5\node_modules\firebase-tools\lib\requireAuth.js:100:20)
+    at async Object.requirePermissions [as fn] (C:\Users\MF\AppData\Local\npm-cache\_npx\ba4f1959e38407b5\node_modules\firebase-tools\lib\requirePermissions.js:17:5)
+    at async C:\Users\MF\AppData\Local\npm-cache\_npx\ba4f1959e38407b5\node_modules\firebase-tools\lib\command.js:278:17
+[error] 
+[error] Error: Failed to authenticate, have you run firebase login?
