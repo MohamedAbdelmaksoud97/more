@@ -150,17 +150,21 @@ export async function createOrderAction(_state: OrderActionState, formData: Form
       entityId: ref.id,
       after: withoutUndefined(order),
     });
-    await createNotification({
-      title: "طلب جديد للمراجعة",
-      body: `${user.name} أنشأ طلب ${product.name}`,
-      type: "ORDER_CREATED",
-      recipientRole: "coordinator",
-      actorUserId: user.uid,
-      actorName: user.name,
-      relatedEntityType: "order",
-      relatedEntityId: ref.id,
-      requiresAction: true,
-    });
+    await Promise.all(
+      (["coordinator", "admin"] as const).map((recipientRole) =>
+        createNotification({
+          title: "طلب جديد للمراجعة",
+          body: `${user.name} أنشأ طلب ${order.orderNumber} - ${product.name}`,
+          type: "ORDER_CREATED",
+          recipientRole,
+          actorUserId: user.uid,
+          actorName: user.name,
+          relatedEntityType: "order",
+          relatedEntityId: ref.id,
+          requiresAction: recipientRole === "coordinator",
+        }),
+      ),
+    );
     revalidatePath("/marketer/orders");
     revalidatePath("/admin/orders");
     revalidatePath("/coordinator/orders");
@@ -347,11 +351,12 @@ export async function uploadShippingBillAction(_state: OrderActionState, formDat
 export async function confirmDeliveryPaymentAction(_state: OrderActionState, formData: FormData): Promise<OrderActionState> {
   try {
     const user = await requireRole(["admin", "coordinator"]);
+    const documentUrl = String(formData.get("documentUrl") ?? "").trim();
     const parsed = statusUpdateSchema.safeParse({
       orderId: formData.get("orderId"),
       status: "PAYMENT_CONFIRMED",
       collectedAmount: formData.get("collectedAmount"),
-      documentUrl: formData.get("documentUrl"),
+      ...(documentUrl ? { documentUrl } : {}),
     });
     if (!parsed.success || parsed.data.collectedAmount === undefined) {
       return { ok: false, message: "أدخل المبلغ المستلم بشكل صحيح" };
@@ -369,12 +374,9 @@ export async function confirmDeliveryPaymentAction(_state: OrderActionState, for
       return { ok: false, message: "يمكن تأكيد التسليم والتحصيل بعد رفع بوليصة الشحن فقط" };
     }
 
-    const receiptField =
-      parsed.data.documentUrl && user.role === "marketer"
-        ? { deliveryReceiptByMarketerUrl: parsed.data.documentUrl }
-        : parsed.data.documentUrl
-          ? { deliveryReceiptByCoordinatorUrl: parsed.data.documentUrl }
-          : {};
+    const receiptField = parsed.data.documentUrl
+      ? { deliveryReceiptByCoordinatorUrl: parsed.data.documentUrl }
+      : {};
 
     await ref.update({
       ...receiptField,
@@ -399,8 +401,16 @@ export async function confirmDeliveryPaymentAction(_state: OrderActionState, for
       action: "order.delivery_payment_confirmed",
       entityType: "order",
       entityId: order.id,
-      before: { status: order.status, collectedAmount: order.collectedAmount, isPaymentCollected: order.isPaymentCollected },
-      after: { status: "PAYMENT_CONFIRMED", collectedAmount: parsed.data.collectedAmount, isPaymentCollected: true },
+      before: withoutUndefined({
+        status: order.status,
+        collectedAmount: order.collectedAmount,
+        isPaymentCollected: order.isPaymentCollected,
+      }),
+      after: withoutUndefined({
+        status: "PAYMENT_CONFIRMED",
+        collectedAmount: parsed.data.collectedAmount,
+        isPaymentCollected: true,
+      }),
     });
     await createNotification({
       title: "تم تأكيد التسليم والتحصيل",
