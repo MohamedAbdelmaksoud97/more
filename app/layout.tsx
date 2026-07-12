@@ -20,7 +20,10 @@ export const metadata: Metadata = {
     statusBarStyle: "default",
   },
   icons: {
-    icon: "/favicon.ico",
+    icon: [
+      { url: "/more-power-more-energy.png", type: "image/png", sizes: "512x512" },
+      { url: "/icon.png", type: "image/png", sizes: "512x512" },
+    ],
     apple: "/more-power-more-energy.png",
   },
 };
