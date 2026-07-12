@@ -1259,3 +1259,193 @@ https://react.dev/link/hydration-mismatch
  
 [browser] [2026-07-12T12:12:17.621Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
 [browser] [2026-07-12T12:12:17.624Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T12:13:31.601Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T12:13:31.602Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+
+  ...
+    <HTTPAccessFallbackBoundary notFound={{...}} forbidden={undefined} unauthorized={undefined}>
+      <HTTPAccessFallbackErrorBoundary pathname="/admin/com..." notFound={{...}} forbidden={undefined} ...>
+        <RedirectBoundary>
+          <RedirectErrorBoundary router={{...}}>
+            <InnerLayoutRouter url="/admin/com..." tree={[...]} params={{}} cacheNode={{rsc:{...}, ...}} ...>
+              <SegmentViewNode type="layout" pagePath="admin/layo...">
+                <SegmentTrieNode>
+                <script>
+                <script>
+                <script>
+                <script>
+                <script>
+                <script>
+                <script>
+                <script>
+                <script>
+                <script>
+                <AdminLayout>
+                  <AppShell>
+                    <div className="min-h-scre...">
+                      <FcmRegistration>
+                      <aside>
+                      <div className="min-w-0 lg...">
+                        <header className="sticky top...">
+                          <div>
+                          <div className="flex shrin...">
+                            <LiveNotificationBell>
+                            <LinkComponent>
+                            <LogoutButton>
+                              <button
+                                type="button"
+                                onClick={function logout}
+                                className="inline-flex h-10 items-center gap-2 rounded-lg border border-slate-200 bg-w..."
+-                               fdprocessedid="h05noq"
+                              >
+                        ...
+                          <AdminCommissionsPage>
+                            <div className="grid gap-6">
+                              <div>
+                              ...
+                                <form action={function bound dispatchActionState} className="grid gap-4...">
+                                  <Field label="المسوق" error={undefined}>
+                                    <label className="grid min-w...">
+                                      <span>
+                                      <Select name="marketerId" required={true}>
+                                        <select
+                                          name="marketerId"
+                                          required={true}
+                                          className="h-10 w-full min-w-0 rounded-md border border-slate-200 bg-white p..."
+-                                         fdprocessedid="c9btku"
+                                        >
+                                  <Field label="نوع العمولة" error={undefined}>
+                                    <label className="grid min-w...">
+                                      <span>
+                                      <Select name="commission..." defaultValue="PERCENTAGE" required={true}>
+                                        <select
+                                          name="commissionType"
+                                          defaultValue="PERCENTAGE"
+                                          required={true}
+                                          className="h-10 w-full min-w-0 rounded-md border border-slate-200 bg-white p..."
+-                                         fdprocessedid="mybe0j"
+                                        >
+                                  <Field label="قيمة العمولة" error={undefined}>
+                                    <label className="grid min-w...">
+                                      <span>
+                                      <Input name="commission..." type="number" min={0} step="0.01" ...>
+                                        <input
+                                          name="commissionValue"
+                                          type="number"
+                                          min={0}
+                                          step="0.01"
+                                          placeholder="مثال: 5 أو 150"
+                                          required={true}
+                                          className="h-10 w-full min-w-0 rounded-md border border-slate-200 bg-white p..."
+-                                         fdprocessedid="mafiko"
+                                        >
+                                  <div className="grid conte...">
+                                    <Button type="submit" loading={false}>
+                                      <button
+                                        className="inline-flex h-10 items-center justify-center gap-2 rounded-md px-4 ..."
+                                        disabled={false}
+                                        type="submit"
+-                                       fdprocessedid="wcjlq"
+                                      >
+                                  ...
+                              ...
+                                <form action={function bound dispatchActionState} className="grid gap-4...">
+                                  <Field label="الشهر" error={undefined}>
+                                    <label className="grid min-w...">
+                                      <span>
+                                      <Input name="month" type="number" min={1} max={12} defaultValue={7} required={true}>
+                                        <input
+                                          name="month"
+                                          type="number"
+                                          min={1}
+                                          max={12}
+                                          defaultValue={7}
+                                          required={true}
+                                          className="h-10 w-full min-w-0 rounded-md border border-slate-200 bg-white p..."
+-                                         fdprocessedid="lhfsv"
+                                        >
+                                  <Field label="السنة" error={undefined}>
+                                    <label className="grid min-w...">
+                                      <span>
+                                      <Input name="year" type="number" min={2024} max={2100} defaultValue={2026} ...>
+                                        <input
+                                          name="year"
+                                          type="number"
+                                          min={2024}
+                                          max={2100}
+                                          defaultValue={2026}
+                                          required={true}
+                                          className="h-10 w-full min-w-0 rounded-md border border-slate-200 bg-white p..."
+-                                         fdprocessedid="mhz50l"
+                                        >
+                                  <div className="grid conte...">
+                                    <Button type="submit" variant="danger" loading={false}>
+                                      <button
+                                        className="inline-flex h-10 items-center justify-center gap-2 rounded-md px-4 ..."
+                                        disabled={false}
+                                        type="submit"
+-                                       fdprocessedid="aj189m"
+                                      >
+                                  ...
+                              ...
+            ...
+ 
+[browser] [2026-07-12T12:13:52.631Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T12:13:52.632Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T12:14:10.474Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T12:14:10.475Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+
+  ...
+    <HotReload globalError={[...]} webSocket={WebSocket} staticIndicatorState={{pathname:null, ...}}>
+      <AppDevOverlayErrorBoundary globalError={[...]}>
+        <ReplaySsrOnlyErrors>
+        <DevRootHTTPAccessFallbackBoundary>
+          <HTTPAccessFallbackBoundary notFound={<NotAllowedRootHTTPFallbackError>}>
+            <HTTPAccessFallbackErrorBoundary pathname="/marketer/..." notFound={<NotAllowedRootHTTPFallbackError>} ...>
+              <RedirectBoundary>
+                <RedirectErrorBoundary router={{...}}>
+                  <Head>
+                  <__next_root_layout_boundary__>
+                    <LoadingBoundaryProvider loading={[...]}>
+                      <SegmentViewNode type="layout" pagePath="layout.tsx">
+                        <SegmentTrieNode>
+                        <link>
+                        <script>
+                        <script>
+                        <script>
+                        <RootLayout>
+                          <html lang="ar" dir="rtl" className="ibm_plex_s..." suppressHydrationWarning={true}>
+                            <body
+                              className="min-h-full bg-slate-100"
+-                             cz-shortcut-listen="true"
+                            >
+                  ...
+ 
+[browser] [2026-07-12T12:22:50.238Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T12:22:50.241Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T12:22:55.238Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T12:22:55.238Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T12:23:01.608Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T12:23:01.609Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
