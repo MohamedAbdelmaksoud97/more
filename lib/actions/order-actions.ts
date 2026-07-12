@@ -71,6 +71,15 @@ function orderTotal(order: Pick<Order, "finalPrice" | "quantity">) {
   return order.finalPrice * order.quantity;
 }
 
+function expectedCollectionAmount(order: Order) {
+  const fallback = orderTotal(order) - Number(order.payment?.depositAmount ?? 0);
+  return Number(order.payment?.remainingAmount ?? fallback);
+}
+
+function sameMoneyValue(left: number, right: number) {
+  return Math.abs(left - right) < 0.01;
+}
+
 function calculateCommission(marketer: Pick<UserProfile, "commissionType" | "commissionValue"> | null, total: number) {
   const value = Number(marketer?.commissionValue ?? 0);
   if (!value) return 0;
@@ -395,6 +404,10 @@ export async function confirmDeliveryPaymentAction(_state: OrderActionState, for
         throw new Error("تم تأكيد تحصيل هذا الطلب مسبقا");
       }
 
+      const expectedCollection = expectedCollectionAmount(current);
+      if (!sameMoneyValue(Number(parsed.data.collectedAmount), expectedCollection)) {
+        throw new Error(`المبلغ المستلم عند التسليم يجب أن يساوي المتبقي بعد العربون: ${expectedCollection}`);
+      }
       const marketerSnap = await tx.get(db.collection("users").doc(current.marketerId));
       const marketer = marketerSnap.exists ? ({ uid: marketerSnap.id, ...marketerSnap.data() } as UserProfile) : null;
       const total = orderTotal(current);
@@ -564,6 +577,10 @@ export async function updateOrderStatusAction(formData: FormData) {
     update.deliveryReceiptByCoordinatorUrl = parsed.data.documentUrl;
   }
   if (parsed.data.collectedAmount !== undefined) {
+    const expectedCollection = expectedCollectionAmount(order);
+    if (!sameMoneyValue(Number(parsed.data.collectedAmount), expectedCollection)) {
+      return { ok: false, message: `المبلغ المستلم عند التسليم يجب أن يساوي المتبقي بعد العربون: ${expectedCollection}` };
+    }
     update.collectedAmount = parsed.data.collectedAmount;
     update.isPaymentCollected = true;
     update.status = "PAYMENT_CONFIRMED";

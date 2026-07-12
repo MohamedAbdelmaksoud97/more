@@ -255,6 +255,11 @@ function AuthCard({
               {submitLabel}
               <ArrowLeft className="size-4" />
             </Button>
+            {!register ? (
+              <Link href="/forgot-password" className="text-center text-sm font-bold text-blue-700 hover:underline">
+                نسيت كلمة المرور؟
+              </Link>
+            ) : null}
             {register ? (
               <p className="rounded-lg bg-blue-50 p-3 text-sm leading-6 text-blue-800">
                 <MailCheck className="ml-1 inline size-4" />

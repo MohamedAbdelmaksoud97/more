@@ -50,9 +50,12 @@ export function FulfillmentConfirmationForm({
       <input type="hidden" name="orderId" value={orderId} />
       <input type="hidden" name="documentUrl" value={documentUrl} />
 
-      <Field label="المبلغ المستلم">
+      <Field label="المبلغ المستلم عند التسليم بعد خصم العربون">
         <Input name="collectedAmount" type="number" min={0} step="0.01" defaultValue={defaultAmount} required />
       </Field>
+      <p className="-mt-2 rounded-md bg-amber-50 p-2 text-xs font-bold leading-5 text-amber-800">
+        محاسبياً: العربون محسوب بالفعل ضمن إجمالي البيع، لذلك أدخل هنا المتبقي فقط عند التسليم.
+      </p>
 
       <div className="rounded-lg border border-dashed border-emerald-200 bg-emerald-50/70 p-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
