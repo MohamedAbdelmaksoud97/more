@@ -14,7 +14,7 @@ export function Panel({
   className?: string;
 }) {
   return (
-    <section className={cn("rounded-lg border border-slate-200 bg-white p-5 shadow-sm", className)}>
+    <section className={cn("min-w-0 rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-5", className)}>
       {(title || action) && (
         <div className="mb-4 flex items-start justify-between gap-4">
           <div>
@@ -47,9 +47,9 @@ export function DashboardCard({
     gray: "border-r-slate-400",
   };
   return (
-    <div className={cn("rounded-lg border border-slate-200 border-r-4 bg-white p-4 shadow-sm", accents[tone])}>
-      <p className="text-sm font-semibold text-slate-500">{label}</p>
-      <p className="mt-3 text-2xl font-black text-slate-950">{formatCurrency(value)}</p>
+    <div className={cn("min-w-0 overflow-hidden rounded-lg border border-slate-200 border-r-4 bg-white p-4 shadow-sm", accents[tone])}>
+      <p className="truncate text-sm font-semibold text-slate-500">{label}</p>
+      <p className="mt-3 break-words text-2xl font-black leading-tight text-slate-950">{formatCurrency(value)}</p>
       {hint ? <p className="mt-2 text-xs text-slate-500">{hint}</p> : null}
     </div>
   );

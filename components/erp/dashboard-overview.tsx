@@ -17,22 +17,22 @@ export function DashboardOverview({
   targets?: Target[];
 }) {
   return (
-    <div className="grid gap-6">
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+    <div className="grid min-w-0 gap-6">
+      <div className="grid min-w-0 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <DashboardCard label="إجمالي المبيعات" value={stats.totalSales} tone="blue" />
         <DashboardCard label="صافي النقدية" value={stats.netCash} tone="green" />
         <DashboardCard label="عمولات معلقة" value={stats.pendingCommissions} tone="yellow" />
         <DashboardCard label="المصروفات" value={stats.expenses} tone="gray" />
       </div>
-      <div className="grid gap-6 xl:grid-cols-[1.5fr_1fr]">
+      <div className="grid min-w-0 gap-6 xl:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
         <Panel title="أحدث الطلبات">
-          <DataTable headers={["الطلب", "العميل", "المنتج", "القيمة", "الحالة"]}>
+          <DataTable className="-mx-1 sm:mx-0" tableClassName="min-w-[760px] lg:min-w-full" headers={["الطلب", "العميل", "المنتج", "القيمة", "الحالة"]}>
             {orders.slice(0, 6).map((order) => (
               <tr key={order.id}>
-                <td className="px-4 py-3 font-bold">{formatOrderNumber(order)}</td>
-                <td className="px-4 py-3">{order.customer.customerName}</td>
-                <td className="px-4 py-3">{order.productName}</td>
-                <td className="px-4 py-3">{formatCurrency(order.finalPrice * order.quantity)}</td>
+                <td className="whitespace-nowrap px-4 py-3 font-bold">{formatOrderNumber(order)}</td>
+                <td className="max-w-40 truncate px-4 py-3">{order.customer.customerName}</td>
+                <td className="max-w-44 truncate px-4 py-3">{order.productName}</td>
+                <td className="whitespace-nowrap px-4 py-3">{formatCurrency(order.finalPrice * order.quantity)}</td>
                 <td className="px-4 py-3">
                   <StatusBadge status={order.status} label={orderStatusLabels[order.status]} />
                 </td>
