@@ -3,7 +3,7 @@ import Link from "next/link";
 import { UserCircle } from "lucide-react";
 import { adminNav, COMPANY, coordinatorNav, marketerNav, roleLabels } from "@/lib/constants";
 import type { NavSection, UserProfile } from "@/lib/types";
-import { NotificationBell } from "@/components/erp/notification-bell";
+import { LiveNotificationBell } from "@/components/erp/live-notification-bell";
 import { FcmRegistration } from "@/components/erp/fcm-registration";
 import { LogoutButton } from "@/components/erp/logout-button";
 import { NavLink } from "@/components/erp/nav-link";
@@ -74,7 +74,7 @@ export function AppShell({
             </div>
           </div>
           <div className="flex shrink-0 items-center gap-2">
-            <NotificationBell unreadCount={unreadCount} />
+            <LiveNotificationBell userId={user.uid} role={user.role} initialUnreadCount={unreadCount} />
             <Link href="/profile" className="flex h-10 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 text-sm font-bold hover:bg-slate-50">
               <UserCircle className="size-5 text-blue-700" />
               <span className="hidden sm:inline">{user.name}</span>

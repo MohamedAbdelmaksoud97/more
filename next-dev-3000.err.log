@@ -1127,3 +1127,135 @@ https://react.dev/link/hydration-mismatch
                             >
                   ...
  
+⨯ Error: Module [project]/components/forms/commission-admin-forms.tsx [app-ssr] (ecmascript) was instantiated because it was required from module [project]/node_modules/next/dist/esm/build/templates/app-page.js?page=/marketer/dashboard/page { METADATA_0 => "[project]/app/favicon.ico.mjs { IMAGE => \"[project]/app/favicon.ico (static in ecmascript, tag client)\" } [app-rsc] (structured image object, ecmascript)", MODULE_1 => "[project]/app/layout.tsx [app-rsc] (ecmascript, Next.js Server Component)", MODULE_2 => "[project]/app/error.tsx [app-rsc] (ecmascript, Next.js Server Component)", MODULE_3 => "[project]/app/loading.tsx [app-rsc] (ecmascript, Next.js Server Component)", MODULE_4 => "[project]/node_modules/next/dist/client/components/builtin/not-found.js [app-rsc] (ecmascript, Next.js Server Component)", MODULE_5 => "[project]/node_modules/next/dist/client/components/builtin/forbidden.js [app-rsc] (ecmascript, Next.js Server Component)", MODULE_6 => "[project]/node_modules/next/dist/client/components/builtin/unauthorized.js [app-rsc] (ecmascript, Next.js Server Component)", MODULE_7 => "[project]/node_modules/next/dist/client/components/builtin/global-error.js [app-rsc] (ecmascript, Next.js Server Component)", MODULE_8 => "[project]/app/marketer/layout.tsx [app-rsc] (ecmascript, Next.js Server Component)", MODULE_9 => "[project]/app/marketer/dashboard/page.tsx [app-rsc] (ecmascript, Next.js Server Component)" } [app-rsc] (ecmascript) <locals>, but the module factory is not available.
+This is often caused by a stale browser cache, misconfigured Cache-Control headers, or a service worker serving outdated responses.
+To fix this, make sure your Cache-Control headers allow revalidation of chunks and review your service worker configuration. As an immediate workaround, try hard-reloading the page, clearing the browser cache, or unregistering any service workers.
+    at ignore-listed frames {
+  digest: '2395637715'
+}
+[browser] React instrumentation encountered an error: 'Error: The children should not have changed if we pass in the same set.\n' +
+  '    at updateFiberRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:121140)\n' +
+  '    at updateVirtualChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116568)\n' +
+  '    at updateChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116917)\n' +
+  '    at updateFiberRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:121073)\n' +
+  '    at updateVirtualChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116568)\n' +
+  '    at updateChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116917)\n' +
+  '    at updateFiberRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:121073)\n' +
+  '    at updateVirtualChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116568)\n' +
+  '    at updateChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116917)\n' +
+  '    at updateFiberRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:120463)\n' +
+  '    at updateVirtualChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116478)\n' +
+  '    at updateVirtualInstanceRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:115002)\n' +
+  '    at updateVirtualChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116771)\n' +
+  '    at updateVirtualInstanceRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:115002)\n' +
+  '    at updateVirtualChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116771)\n' +
+  '    at updateChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116917)\n' +
+  '    at updateFiberRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:120463)\n' +
+  '    at updateVirtualChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116478)\n' +
+  '    at updateChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116917)\n' +
+  '    at updateFiberRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:120463)\n' +
+  '    at updateVirtualChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116478)\n' +
+  '    at updateChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116917)\n' +
+  '    at updateFiberRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:120463)\n' +
+  '    at updateVirtualChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116478)\n' +
+  '    at updateChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116917)\n' +
+  '    at updateFiberRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:120463)\n' +
+  '    at updateVirtualChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116478)\n' +
+  '    at updateChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116917)\n' +
+  '    at updateFiberRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:120463)\n' +
+  '    at updateVirtualChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116478)\n' +
+  '    at updateChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116917)\n' +
+  '    at updateFiberRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:120463)\n' +
+  '    at updateVirtualChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116478)\n' +
+  '    at updateChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116917)\n' +
+  '    at updateFiberRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:120463)\n' +
+  '    at updateVirtualChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116478)\n' +
+  '    at updateChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116917)\n' +
+  '    at updateFiberRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:120463)\n' +
+  '    at updateVirtualChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116478)\n' +
+  '    at updateChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116917)\n' +
+  '    at updateFiberRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:120463)\n' +
+  '    at updateVirtualChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116478)\n' +
+  '    at updateChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116917)\n' +
+  '    at updateFiberRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:120463)\n' +
+  '    at updateVirtualChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116478)\n' +
+  '    at <unknown> (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:119825)\n' +
+  '    at updateFiberRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:120024)\n' +
+  '    at updateVirtualChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116478)\n' +
+  '    at updateChildrenRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:116917)\n' +
+  '    at updateFiberRecursively (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:120463)' (chrome-extension://gpphkfbcpidddadnkolkpfckpihlkkil/build/installHook.js:1:86461)
+[browser] [2026-07-12T12:02:32.984Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+    at Logger.defaultLogHandler [as _logHandler] (file://C:/Users/MF/Desktop/more/.next/dev/static/chunks/node_modules_1h3zi_t._.js:3088:24)
+    at Logger.error (file://C:/Users/MF/Desktop/more/.next/dev/static/chunks/node_modules_1h3zi_t._.js:3163:14) (file://C:/Users/MF/Desktop/more/.next/dev/static/chunks/node_modules_1h3zi_t._.js:3088:24)
+[browser] [2026-07-12T12:02:32.997Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+    at Logger.defaultLogHandler [as _logHandler] (file://C:/Users/MF/Desktop/more/.next/dev/static/chunks/node_modules_1h3zi_t._.js:3088:24)
+    at Logger.error (file://C:/Users/MF/Desktop/more/.next/dev/static/chunks/node_modules_1h3zi_t._.js:3163:14) (file://C:/Users/MF/Desktop/more/.next/dev/static/chunks/node_modules_1h3zi_t._.js:3088:24)
+[browser] [2026-07-12T12:04:09.600Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+    at Logger.defaultLogHandler [as _logHandler] (file://C:/Users/MF/Desktop/more/.next/dev/static/chunks/node_modules_1h3zi_t._.js:3088:24)
+    at Logger.error (file://C:/Users/MF/Desktop/more/.next/dev/static/chunks/node_modules_1h3zi_t._.js:3163:14) (file://C:/Users/MF/Desktop/more/.next/dev/static/chunks/node_modules_1h3zi_t._.js:3088:24)
+[browser] [2026-07-12T12:04:09.602Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+    at Logger.defaultLogHandler [as _logHandler] (file://C:/Users/MF/Desktop/more/.next/dev/static/chunks/node_modules_1h3zi_t._.js:3088:24)
+    at Logger.error (file://C:/Users/MF/Desktop/more/.next/dev/static/chunks/node_modules_1h3zi_t._.js:3163:14) (file://C:/Users/MF/Desktop/more/.next/dev/static/chunks/node_modules_1h3zi_t._.js:3088:24)
+[browser] [2026-07-12T12:07:14.649Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T12:07:14.653Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T12:07:33.178Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T12:07:33.179Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T12:07:38.760Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T12:07:38.761Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T12:07:49.242Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T12:07:49.243Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] Uncaught Error: Switched to client rendering because the server rendering errored:
+
+Module [project]/components/forms/commission-admin-forms.tsx [app-ssr] (ecmascript) was instantiated because it was required from module [project]/node_modules/next/dist/esm/build/templates/app-page.js?page=/marketer/dashboard/page { METADATA_0 => "[project]/app/favicon.ico.mjs { IMAGE => \"[project]/app/favicon.ico (static in ecmascript, tag client)\" } [app-rsc] (structured image object, ecmascript)", MODULE_1 => "[project]/app/layout.tsx [app-rsc] (ecmascript, Next.js Server Component)", MODULE_2 => "[project]/app/error.tsx [app-rsc] (ecmascript, Next.js Server Component)", MODULE_3 => "[project]/app/loading.tsx [app-rsc] (ecmascript, Next.js Server Component)", MODULE_4 => "[project]/node_modules/next/dist/client/components/builtin/not-found.js [app-rsc] (ecmascript, Next.js Server Component)", MODULE_5 => "[project]/node_modules/next/dist/client/components/builtin/forbidden.js [app-rsc] (ecmascript, Next.js Server Component)", MODULE_6 => "[project]/node_modules/next/dist/client/components/builtin/unauthorized.js [app-rsc] (ecmascript, Next.js Server Component)", MODULE_7 => "[project]/node_modules/next/dist/client/components/builtin/global-error.js [app-rsc] (ecmascript, Next.js Server Component)", MODULE_8 => "[project]/app/marketer/layout.tsx [app-rsc] (ecmascript, Next.js Server Component)", MODULE_9 => "[project]/app/marketer/dashboard/page.tsx [app-rsc] (ecmascript, Next.js Server Component)" } [app-rsc] (ecmascript) <locals>, but the module factory is not available.
+This is often caused by a stale browser cache, misconfigured Cache-Control headers, or a service worker serving outdated responses.
+To fix this, make sure your Cache-Control headers allow revalidation of chunks and review your service worker configuration. As an immediate workaround, try hard-reloading the page, clearing the browser cache, or unregistering any service workers.
+[browser] [2026-07-12T12:02:21.753Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T12:02:21.763Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T12:02:25.604Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T12:02:25.737Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T12:04:09.576Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T12:04:09.576Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T12:10:31.988Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T12:10:31.994Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T12:11:07.477Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T12:11:07.484Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+
+  ...
+    <HotReload globalError={[...]} webSocket={WebSocket} staticIndicatorState={{pathname:null, ...}}>
+      <AppDevOverlayErrorBoundary globalError={[...]}>
+        <ReplaySsrOnlyErrors>
+        <DevRootHTTPAccessFallbackBoundary>
+          <HTTPAccessFallbackBoundary notFound={<NotAllowedRootHTTPFallbackError>}>
+            <HTTPAccessFallbackErrorBoundary pathname="/" notFound={<NotAllowedRootHTTPFallbackError>} ...>
+              <RedirectBoundary>
+                <RedirectErrorBoundary router={{...}}>
+                  <Head>
+                  <__next_root_layout_boundary__>
+                    <LoadingBoundaryProvider loading={[...]}>
+                      <SegmentViewNode type="layout" pagePath="layout.tsx">
+                        <SegmentTrieNode>
+                        <link>
+                        <script>
+                        <script>
+                        <script>
+                        <RootLayout>
+                          <html lang="ar" dir="rtl" className="ibm_plex_s..." suppressHydrationWarning={true}>
+                            <body
+                              className="min-h-full bg-slate-100"
+-                             cz-shortcut-listen="true"
+                            >
+                  ...
+ 
+[browser] [2026-07-12T12:12:17.621Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T12:12:17.624Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 

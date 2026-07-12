@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { BellRing } from "lucide-react";
+import { BellRing, Smartphone } from "lucide-react";
 import { getToken, onMessage } from "firebase/messaging";
 import { getFirebaseMessaging } from "@/lib/firebase/client";
 
@@ -65,6 +65,7 @@ function playNotificationSound() {
 
 export function FcmRegistration() {
   const [toast, setToast] = useState<{ title: string; body?: string } | null>(null);
+  const [permissionPrompt, setPermissionPrompt] = useState<"default" | "denied" | null>(null);
 
   useEffect(() => {
     const unlock = () => void unlockNotificationSound();
@@ -80,13 +81,24 @@ export function FcmRegistration() {
     let cancelled = false;
     let toastTimer: number | undefined;
 
-    async function register() {
+    async function register(requirePermissionRequest = false) {
       if (!("Notification" in window) || !("serviceWorker" in navigator)) return;
+      if (Notification.permission === "default" && !requirePermissionRequest) {
+        setPermissionPrompt("default");
+        return;
+      }
       if (Notification.permission === "default") {
         const permission = await Notification.requestPermission();
-        if (permission !== "granted") return;
+        if (permission !== "granted") {
+          setPermissionPrompt(permission === "denied" ? "denied" : "default");
+          return;
+        }
       }
-      if (Notification.permission !== "granted") return;
+      if (Notification.permission !== "granted") {
+        setPermissionPrompt("denied");
+        return;
+      }
+      setPermissionPrompt(null);
       const messaging = await getFirebaseMessaging();
       if (!messaging || cancelled) return;
       const registration = await navigator.serviceWorker.register("/firebase-messaging-sw.js");
@@ -114,27 +126,62 @@ export function FcmRegistration() {
       });
     }
 
+    const enableNotifications = () => void register(true);
+
     void register();
+    window.addEventListener("more-energy-enable-notifications", enableNotifications);
     return () => {
       cancelled = true;
       if (toastTimer) window.clearTimeout(toastTimer);
+      window.removeEventListener("more-energy-enable-notifications", enableNotifications);
     };
   }, []);
 
-  return toast ? (
-    <div className="fixed left-4 top-24 z-[80] w-[min(360px,calc(100vw-2rem))] animate-in slide-in-from-left-5">
-      <div className="relative overflow-hidden rounded-lg border border-amber-200 bg-white p-4 shadow-2xl ring-4 ring-amber-100">
-        <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-amber-400 via-blue-600 to-emerald-500" />
-        <div className="flex gap-3">
-          <div className="grid size-11 shrink-0 place-items-center rounded-full bg-amber-100 text-amber-700 ring-4 ring-amber-50">
-            <BellRing className="size-5 animate-pulse" />
-          </div>
-          <div className="min-w-0">
-            <p className="font-black text-slate-950">{toast.title}</p>
-            {toast.body ? <p className="mt-1 text-sm font-semibold leading-6 text-slate-600">{toast.body}</p> : null}
+  return (
+    <>
+      {permissionPrompt ? (
+        <div className="fixed bottom-4 left-4 z-[80] w-[min(390px,calc(100vw-2rem))] rounded-lg border border-blue-200 bg-white p-4 shadow-2xl ring-4 ring-blue-100">
+          <div className="flex gap-3">
+            <div className="grid size-11 shrink-0 place-items-center rounded-full bg-blue-100 text-blue-700">
+              <Smartphone className="size-5" />
+            </div>
+            <div className="min-w-0">
+              <p className="font-black text-slate-950">تفعيل إشعارات الجهاز</p>
+              <p className="mt-1 text-sm font-semibold leading-6 text-slate-600">
+                {permissionPrompt === "denied"
+                  ? "الإشعارات مرفوضة من إعدادات المتصفح. فعّلها من Site settings حتى تصل للموبايل."
+                  : "اضغط لتفعيل تنبيهات الطلبات والحساب حتى تصلك كإشعار من المتصفح."}
+              </p>
+              {permissionPrompt === "default" ? (
+                <button
+                  type="button"
+                  className="mt-3 h-10 rounded-md bg-blue-700 px-4 text-sm font-bold text-white hover:bg-blue-800"
+                  onClick={() => window.dispatchEvent(new Event("more-energy-enable-notifications"))}
+                >
+                  تفعيل الإشعارات
+                </button>
+              ) : null}
+            </div>
           </div>
         </div>
-      </div>
-    </div>
-  ) : null;
+      ) : null}
+
+      {toast ? (
+        <div className="fixed left-4 top-24 z-[80] w-[min(360px,calc(100vw-2rem))] animate-in slide-in-from-left-5">
+          <div className="relative overflow-hidden rounded-lg border border-amber-200 bg-white p-4 shadow-2xl ring-4 ring-amber-100">
+            <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-amber-400 via-blue-600 to-emerald-500" />
+            <div className="flex gap-3">
+              <div className="grid size-11 shrink-0 place-items-center rounded-full bg-amber-100 text-amber-700 ring-4 ring-amber-50">
+                <BellRing className="size-5 animate-pulse" />
+              </div>
+              <div className="min-w-0">
+                <p className="font-black text-slate-950">{toast.title}</p>
+                {toast.body ? <p className="mt-1 text-sm font-semibold leading-6 text-slate-600">{toast.body}</p> : null}
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </>
+  );
 }
