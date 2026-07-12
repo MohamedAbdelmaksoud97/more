@@ -54,6 +54,7 @@ export const adminNav: NavSection[] = [
       { href: "/admin/inventory", label: "المخزون" },
       { href: "/admin/orders", label: "الطلبات" },
       { href: "/admin/orders/new", label: "طلب جديد" },
+      { href: "/admin/notifications", label: "الإشعارات" },
     ],
   },
   {
@@ -64,13 +65,6 @@ export const adminNav: NavSection[] = [
       { href: "/admin/expenses", label: "المصروفات" },
       { href: "/admin/reports", label: "التقارير" },
       { href: "/admin/scrap", label: "الكهنة" },
-    ],
-  },
-  {
-    title: "النظام",
-    links: [
-      { href: "/admin/notifications", label: "الإشعارات" },
-      { href: "/admin/settings", label: "الإعدادات" },
     ],
   },
 ];

@@ -1,6 +1,6 @@
 # Firestore Rules Analysis - MORE Energy ERP
 
-This untracked analysis summarizes the first-pass Firestore access model used to generate `firestore.rules`.
+This untracked analysis summarizes the first-pass Firestore access model used to generate `firestore.rules`..
 
 ## Collections
 
