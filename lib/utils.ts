@@ -15,19 +15,35 @@ export function formatCurrency(value: number) {
   }).format(value);
 }
 
-export function formatDate(value: string | Date) {
+function normalizeDate(value: unknown) {
+  if (value instanceof Date) return value;
+  if (typeof value === "string" || typeof value === "number") return new Date(value);
+  if (value && typeof value === "object") {
+    const candidate = value as {
+      toDate?: () => Date;
+      seconds?: number;
+      _seconds?: number;
+    };
+    if (typeof candidate.toDate === "function") return candidate.toDate();
+    if (typeof candidate.seconds === "number") return new Date(candidate.seconds * 1000);
+    if (typeof candidate._seconds === "number") return new Date(candidate._seconds * 1000);
+  }
+  return new Date();
+}
+
+export function formatDate(value: unknown) {
   return new Intl.DateTimeFormat("ar-EG", {
     timeZone: EGYPT_TIME_ZONE,
     dateStyle: "medium",
     timeStyle: "short",
-  }).format(new Date(value));
+  }).format(normalizeDate(value));
 }
 
-export function formatDateOnly(value: string | Date) {
+export function formatDateOnly(value: unknown) {
   return new Intl.DateTimeFormat("ar-EG", {
     timeZone: EGYPT_TIME_ZONE,
     dateStyle: "medium",
-  }).format(new Date(value));
+  }).format(normalizeDate(value));
 }
 
 export function formatOrderNumber(order: { id: string; orderNumber?: string; createdAt?: string }) {

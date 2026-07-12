@@ -25,19 +25,46 @@ import {
 } from "@/lib/data/demo";
 import { canReadOrder } from "@/lib/auth";
 
-function fromDoc<T>(doc: FirebaseFirestore.DocumentSnapshot): T {
-  const data = doc.data() ?? {};
-  return JSON.parse(
-    JSON.stringify(
-      { id: doc.id, ...data },
-      (_key, value) => (value instanceof Timestamp ? value.toDate().toISOString() : value),
-    ),
-  ) as T;
-}
-
 function dbOrNull() {
   if (!hasFirebaseAdminConfig()) return null;
   return getAdminDb();
+}
+
+function isTimestampLike(value: unknown): value is {
+  toDate?: () => Date;
+  seconds?: number;
+  _seconds?: number;
+  nanoseconds?: number;
+  _nanoseconds?: number;
+} {
+  return Boolean(value && typeof value === "object");
+}
+
+function timestampLikeToDate(value: unknown) {
+  if (value instanceof Timestamp) return value.toDate();
+  if (!isTimestampLike(value)) return null;
+  if (typeof value.toDate === "function") return value.toDate();
+  const seconds = typeof value.seconds === "number" ? value.seconds : value._seconds;
+  const nanoseconds = typeof value.nanoseconds === "number" ? value.nanoseconds : value._nanoseconds;
+  if (typeof seconds === "number") return new Date(seconds * 1000 + Math.floor((nanoseconds ?? 0) / 1_000_000));
+  return null;
+}
+
+function serializeFirestoreValue(value: unknown): unknown {
+  const date = timestampLikeToDate(value);
+  if (date) return date.toISOString();
+  if (value instanceof Date) return value.toISOString();
+  if (Array.isArray(value)) return value.map(serializeFirestoreValue);
+  if (value && typeof value === "object") {
+    return Object.fromEntries(
+      Object.entries(value as Record<string, unknown>).map(([key, item]) => [key, serializeFirestoreValue(item)]),
+    );
+  }
+  return value;
+}
+
+function fromDoc<T>(doc: FirebaseFirestore.DocumentSnapshot): T {
+  return serializeFirestoreValue({ id: doc.id, ...(doc.data() ?? {}) }) as T;
 }
 
 function withoutUndefined<T>(value: T): T {
@@ -52,6 +79,28 @@ function withoutUndefined<T>(value: T): T {
     ) as T;
   }
   return value;
+}
+
+function dateMillis(value: unknown) {
+  if (!value) return 0;
+  const timestampDate = timestampLikeToDate(value);
+  if (timestampDate) return timestampDate.getTime();
+  if (value instanceof Date) return value.getTime();
+  if (typeof value === "string" || typeof value === "number") {
+    const parsed = new Date(value).getTime();
+    return Number.isNaN(parsed) ? 0 : parsed;
+  }
+  if (typeof value === "object") {
+    const candidate = value as {
+      toDate?: () => Date;
+      seconds?: number;
+      _seconds?: number;
+    };
+    if (typeof candidate.toDate === "function") return candidate.toDate().getTime();
+    if (typeof candidate.seconds === "number") return candidate.seconds * 1000;
+    if (typeof candidate._seconds === "number") return candidate._seconds * 1000;
+  }
+  return 0;
 }
 
 export async function listUsers(): Promise<UserProfile[]> {
@@ -88,7 +137,7 @@ export async function listOrders(viewer: UserProfile, status?: OrderStatus): Pro
   const snap = await query.limit(300).get();
   return snap.docs
     .map((doc) => fromDoc<Order>(doc))
-    .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+    .sort((a, b) => dateMillis(b.updatedAt) - dateMillis(a.updatedAt));
 }
 
 export async function getOrder(viewer: UserProfile, id: string): Promise<Order | null> {
@@ -113,16 +162,16 @@ export async function listNotifications(viewer: UserProfile): Promise<Notificati
   const byUser = await db
     .collection("notifications")
     .where("recipientUserId", "==", viewer.uid)
-    .limit(50)
+    .limit(200)
     .get();
   const byRole = await db
     .collection("notifications")
     .where("recipientRole", "==", viewer.role)
-    .limit(50)
+    .limit(200)
     .get();
   const merged = new Map<string, NotificationItem>();
   [...byUser.docs, ...byRole.docs].forEach((doc) => merged.set(doc.id, fromDoc<NotificationItem>(doc)));
-  return [...merged.values()].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  return [...merged.values()].sort((a, b) => dateMillis(b.createdAt) - dateMillis(a.createdAt));
 }
 
 export async function listTargets(): Promise<Target[]> {

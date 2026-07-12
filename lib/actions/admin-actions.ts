@@ -84,36 +84,44 @@ export async function updateUserRoleAction(formData: FormData) {
 }
 
 export async function createExpenseAction(_state: ActionState, formData: FormData): Promise<ActionState> {
-  const actor = await requireRole(["admin"]);
-  const parsed = expenseSchema.safeParse(Object.fromEntries(formData.entries()));
-  if (!parsed.success) return { ok: false, message: "راجع بيانات المصروف", errors: parsed.error.flatten().fieldErrors };
-  if (!hasFirebaseAdminConfig()) return { ok: true, message: "تم تسجيل المصروف في وضع العرض التجريبي" };
+  try {
+    const actor = await requireRole(["admin"]);
+    const parsed = expenseSchema.safeParse(Object.fromEntries(formData.entries()));
+    if (!parsed.success) return { ok: false, message: "راجع بيانات المصروف", errors: parsed.error.flatten().fieldErrors };
+    if (!hasFirebaseAdminConfig()) return { ok: true, message: "تم تسجيل المصروف في وضع العرض التجريبي" };
 
-  const db = getAdminDb();
-  if (!db) return { ok: false, message: "Firebase Admin غير مهيأ" };
+    const db = getAdminDb();
+    if (!db) return { ok: false, message: "Firebase Admin غير مهيأ" };
 
-  const ref = await db.collection("expenses").add({ ...parsed.data, createdBy: actor.uid, createdAt: new Date().toISOString() });
-  await writeAudit({
-    actorUserId: actor.uid,
-    actorRole: actor.role,
-    action: "expense.create",
-    entityType: "expense",
-    entityId: ref.id,
-    after: parsed.data,
-  });
-  await createNotification({
-    title: "تم تسجيل مصروف",
-    body: `${parsed.data.category}: ${parsed.data.amount}`,
-    type: "EXPENSE_CREATED",
-    recipientRole: "admin",
-    actorUserId: actor.uid,
-    actorName: actor.name,
-    relatedEntityType: "report",
-    relatedEntityId: ref.id,
-    requiresAction: false,
-  });
-  revalidatePath("/admin/expenses");
-  return { ok: true, message: "تم تسجيل المصروف" };
+    const expense = withoutUndefined({ ...parsed.data, createdBy: actor.uid, createdAt: new Date().toISOString() });
+    const ref = await db.collection("expenses").add(expense);
+    await writeAudit({
+      actorUserId: actor.uid,
+      actorRole: actor.role,
+      action: "expense.create",
+      entityType: "expense",
+      entityId: ref.id,
+      after: expense,
+    });
+    await createNotification({
+      title: "تم تسجيل مصروف",
+      body: `${parsed.data.category}: ${parsed.data.amount}`,
+      type: "EXPENSE_CREATED",
+      recipientRole: "admin",
+      actorUserId: actor.uid,
+      actorName: actor.name,
+      relatedEntityType: "report",
+      relatedEntityId: ref.id,
+      requiresAction: false,
+    });
+    revalidatePath("/admin/expenses");
+    revalidatePath("/admin/dashboard");
+    revalidatePath("/admin/reports");
+    return { ok: true, message: "تم تسجيل المصروف" };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "تعذر تسجيل المصروف";
+    return { ok: false, message };
+  }
 }
 
 export async function upsertTargetAction(_state: ActionState, formData: FormData): Promise<ActionState> {

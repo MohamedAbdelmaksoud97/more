@@ -1984,3 +1984,153 @@ https://react.dev/link/hydration-mismatch
 [browser] [2026-07-12T18:30:15.198Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
 [browser] [2026-07-12T18:30:22.764Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
 [browser] [2026-07-12T18:30:22.765Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T18:31:35.566Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T18:31:35.567Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T18:31:52.992Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T18:31:52.992Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T18:34:36.254Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T18:34:36.256Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T18:37:39.622Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T18:37:39.623Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T18:37:57.329Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T18:37:57.329Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T18:38:00.478Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T18:38:00.478Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T18:38:03.205Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T18:38:03.206Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T18:38:06.362Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T18:38:06.362Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+⨯ Error: Value for argument "data" is not a valid Firestore document. Cannot use "undefined" as a Firestore value (found in field "attachmentUrl"). If you want to ignore undefined values, enable `ignoreUndefinedProperties`.
+    at createExpenseAction (lib\actions\admin-actions.ts:95:47)
+  93 | ...f (!db) return { ok: false, message: "Firebase Admin غير مهيأ" };
+  94 | ...
+> 95 | ...onst ref = await db.collection("expenses").add({ ...parsed.data, createdBy: actor.uid, ...
+     |                                               ^
+  96 | ...wait writeAudit({
+  97 | ... actorUserId: actor.uid,
+  98 | ... actorRole: actor.role, {
+  digest: '4193613287'
+}
+[browser] [2026-07-12T18:40:15.697Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T18:40:15.698Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+⨯ Error: Value for argument "data" is not a valid Firestore document. Cannot use "undefined" as a Firestore value (found in field "attachmentUrl"). If you want to ignore undefined values, enable `ignoreUndefinedProperties`.
+    at createExpenseAction (lib\actions\admin-actions.ts:95:47)
+  93 | ...f (!db) return { ok: false, message: "Firebase Admin غير مهيأ" };
+  94 | ...
+> 95 | ...onst ref = await db.collection("expenses").add({ ...parsed.data, createdBy: actor.uid, ...
+     |                                               ^
+  96 | ...wait writeAudit({
+  97 | ... actorUserId: actor.uid,
+  98 | ... actorRole: actor.role, {
+  digest: '4193613287'
+}
+[browser] [2026-07-12T18:40:59.657Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T18:40:59.657Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T18:41:26.049Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T18:41:26.195Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+⨯ TypeError: b.createdAt.localeCompare is not a function
+    at <unknown> (lib\data\repository.ts:125:58)
+    at Array.sort (<anonymous>)
+    at listNotifications (lib\data\repository.ts:125:31)
+    at async AdminLayout (app\admin\layout.tsx:9:25)
+  123 | ... = new Map<string, NotificationItem>();
+  124 | ...ocs, ...byRole.docs].forEach((doc) => merged.set(doc.id, fromDoc<NotificationItem>(doc...
+> 125 | ...erged.values()].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+      |                                               ^
+  126 | ...
+  127 | ...
+  128 | ...unction listTargets(): Promise<Target[]> { {
+  digest: '3837645761'
+}
+⨯ TypeError: b.createdAt.localeCompare is not a function
+    at <unknown> (lib\data\repository.ts:125:58)
+    at Array.sort (<anonymous>)
+    at listNotifications (lib\data\repository.ts:125:31)
+    at async AdminLayout (app\admin\layout.tsx:9:25)
+  123 | ... = new Map<string, NotificationItem>();
+  124 | ...ocs, ...byRole.docs].forEach((doc) => merged.set(doc.id, fromDoc<NotificationItem>(doc...
+> 125 | ...erged.values()].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+      |                                               ^
+  126 | ...
+  127 | ...
+  128 | ...unction listTargets(): Promise<Target[]> { {
+  digest: '3837645761'
+}
+⨯ TypeError: b.createdAt.localeCompare is not a function
+    at <unknown> (lib\data\repository.ts:125:58)
+    at Array.sort (<anonymous>)
+    at listNotifications (lib\data\repository.ts:125:31)
+    at async AdminLayout (app\admin\layout.tsx:9:25)
+  123 | ... = new Map<string, NotificationItem>();
+  124 | ...ocs, ...byRole.docs].forEach((doc) => merged.set(doc.id, fromDoc<NotificationItem>(doc...
+> 125 | ...erged.values()].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+      |                                               ^
+  126 | ...
+  127 | ...
+  128 | ...unction listTargets(): Promise<Target[]> { {
+  digest: '3837645761'
+}
+⨯ TypeError: b.createdAt.localeCompare is not a function
+    at <unknown> (lib\data\repository.ts:125:58)
+    at Array.sort (<anonymous>)
+    at listNotifications (lib\data\repository.ts:125:31)
+    at async AdminLayout (app\admin\layout.tsx:9:25)
+  123 | ... = new Map<string, NotificationItem>();
+  124 | ...ocs, ...byRole.docs].forEach((doc) => merged.set(doc.id, fromDoc<NotificationItem>(doc...
+> 125 | ...erged.values()].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+      |                                               ^
+  126 | ...
+  127 | ...
+  128 | ...unction listTargets(): Promise<Target[]> { {
+  digest: '3837645761'
+}
+[browser] Uncaught Error: Switched to client rendering because the server rendering errored:
+
+b.createdAt.localeCompare is not a function
+    at <anonymous> (lib\data\repository.ts:124:10)
+    at Array.sort (<anonymous>:1:19)
+    at listNotifications (lib\data\repository.ts:124:3)
+    at  AdminLayout (app\admin\layout.tsx:2:1)
+  122 |   if (!snap.exists) return null;
+  123 |   const order = fromDoc<Order>(snap);
+> 124 |   return canReadOrder(viewer, order.marketerId) ? order : null;
+      |          ^
+  125 | }
+  126 |
+  127 | export async function listNotifications(viewer: UserProfile): Promise<NotificationItem[]> {
+[browser] [2026-07-12T18:44:27.884Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T18:44:27.884Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T18:45:01.136Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T18:45:01.137Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T18:45:22.748Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T18:45:22.749Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T18:45:30.214Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T18:45:30.214Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T18:46:00.492Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T18:46:00.492Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T18:46:07.890Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T18:46:07.891Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T18:46:42.018Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T18:46:42.018Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T18:48:46.055Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T18:48:46.055Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T18:48:50.012Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T18:48:50.012Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T18:48:51.990Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T18:48:51.990Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T18:48:54.416Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T18:48:54.416Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T18:49:26.151Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T18:49:26.153Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T18:49:43.218Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T18:49:43.219Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T18:50:09.332Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T18:50:09.332Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T18:50:16.137Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T18:50:16.137Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T18:50:59.633Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T18:50:59.633Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T18:51:07.424Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T18:51:07.424Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T18:51:23.671Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T18:51:23.672Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
