@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { MailCheck } from "lucide-react";
+import { VerifyEmailActions } from "@/components/forms/verify-email-actions";
 
 export default function VerifyEmailPage() {
   return (
@@ -24,6 +25,7 @@ export default function VerifyEmailPage() {
         <Link className="mt-6 inline-flex h-11 items-center rounded-lg bg-blue-700 px-5 text-sm font-bold text-white hover:bg-blue-800" href="/login">
           تم التأكيد، تسجيل الدخول
         </Link>
+        <VerifyEmailActions />
       </section>
     </main>
   );

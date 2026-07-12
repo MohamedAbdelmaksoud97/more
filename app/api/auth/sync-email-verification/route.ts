@@ -27,7 +27,48 @@ export async function POST(request: Request) {
   const snap = await userRef.get();
 
   if (!snap.exists) {
-    return NextResponse.json({ error: "الحساب غير مسجل في النظام" }, { status: 404 });
+    const now = new Date().toISOString();
+    const hasAnyUser = !(await db.collection("users").limit(1).get()).empty;
+    const role = hasAnyUser ? "marketer" : "admin";
+    const status = hasAnyUser
+      ? authUser.emailVerified
+        ? "PENDING_ADMIN_APPROVAL"
+        : "PENDING_EMAIL_VERIFICATION"
+      : "APPROVED";
+    const name = authUser.displayName || authUser.email?.split("@")[0] || "مستخدم جديد";
+
+    await userRef.set({
+      uid: decoded.uid,
+      name,
+      email: authUser.email ?? decoded.email ?? "",
+      phone: "",
+      role,
+      status,
+      emailVerified: authUser.emailVerified,
+      ...(authUser.emailVerified ? { emailVerifiedAt: now } : {}),
+      fcmTokens: [],
+      commissionType: "PERCENTAGE",
+      commissionValue: 0,
+      createdAt: now,
+      updatedAt: now,
+    });
+    await auth.setCustomUserClaims(decoded.uid, { role, status });
+
+    if (hasAnyUser && status === "PENDING_ADMIN_APPROVAL") {
+      await createNotification({
+        title: "حساب جديد بانتظار الموافقة",
+        body: `${name} أكد البريد وينتظر اعتماد المدير`,
+        type: "USER_REGISTERED",
+        recipientRole: "admin",
+        actorUserId: decoded.uid,
+        actorName: name,
+        relatedEntityType: "user",
+        relatedEntityId: decoded.uid,
+        requiresAction: true,
+      });
+    }
+
+    return NextResponse.json({ ok: true, status, emailVerified: authUser.emailVerified, repaired: true });
   }
 
   const user = snap.data() ?? {};

@@ -7,7 +7,6 @@ import {
   createUserWithEmailAndPassword,
   sendEmailVerification,
   signInWithEmailAndPassword,
-  signOut,
 } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, MailCheck } from "lucide-react";
@@ -29,6 +28,33 @@ function friendlyAuthError(error: unknown) {
   if (code.includes("invalid-credential")) return "البريد أو كلمة المرور غير صحيحين.";
   if (error instanceof Error && error.message) return error.message;
   return "حدث خطأ غير معروف";
+}
+
+function getEmailActionUrl() {
+  const configuredUrl = process.env.NEXT_PUBLIC_APP_URL?.trim();
+  const origin = configuredUrl || (typeof window !== "undefined" ? window.location.origin : "");
+  return `${origin.replace(/\/$/, "")}/login`;
+}
+
+function friendlyVerificationError(error: unknown) {
+  const code = getErrorCode(error);
+  if (code.includes("unauthorized-continue-uri") || code.includes("unauthorized-domain")) {
+    return "تعذر إرسال رابط التأكيد لأن دومين الموقع غير مضاف في Firebase Authentication. أضف more-mocha.vercel.app في Authorized domains.";
+  }
+  if (code.includes("too-many-requests")) {
+    return "تم إرسال روابط كثيرة خلال وقت قصير. انتظر قليلا ثم جرّب إعادة الإرسال.";
+  }
+  if (code.includes("missing-continue-uri")) {
+    return "رابط الرجوع بعد تأكيد البريد غير مضبوط. راجع NEXT_PUBLIC_APP_URL.";
+  }
+  return friendlyAuthError(error);
+}
+
+async function sendVerificationEmail(user: Parameters<typeof sendEmailVerification>[0]) {
+  await sendEmailVerification(user, {
+    url: getEmailActionUrl(),
+    handleCodeInApp: false,
+  });
 }
 
 async function syncEmailVerification(idToken: string) {
@@ -86,10 +112,7 @@ export function LoginForm() {
           return;
         }
         if (result.status === "PENDING_EMAIL_VERIFICATION") {
-          await sendEmailVerification(credential.user, {
-            url: `${window.location.origin}/login`,
-            handleCodeInApp: false,
-          }).catch(() => undefined);
+          await sendVerificationEmail(credential.user);
           await syncEmailVerification(token);
         }
         router.push("/verify-email");
@@ -147,10 +170,6 @@ export function RegisterForm() {
 
     try {
       const credential = await createUserWithEmailAndPassword(auth, String(payload.email), String(payload.password));
-      await sendEmailVerification(credential.user, {
-        url: `${window.location.origin}/login`,
-        handleCodeInApp: false,
-      });
       const token = await credential.user.getIdToken(true);
       const response = await fetch("/api/register", {
         method: "POST",
@@ -159,14 +178,14 @@ export function RegisterForm() {
       });
       const result = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(result.error ?? "تعذر تسجيل الحساب");
-      await signOut(auth).catch(() => undefined);
+      await sendVerificationEmail(credential.user);
       router.push(result.status === "APPROVED" ? "/login" : "/verify-email");
     } catch (error) {
       const code = getErrorCode(error);
       if (code.includes("operation-not-allowed")) {
         setError("فعّل Email/Password من Firebase Authentication حتى يتم إرسال رابط تأكيد البريد.");
       } else {
-        setError(friendlyAuthError(error));
+        setError(friendlyVerificationError(error));
       }
     } finally {
       setLoading(false);
