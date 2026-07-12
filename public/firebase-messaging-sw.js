@@ -3,16 +3,34 @@ self.addEventListener("push", (event) => {
   const title = payload.notification?.title || payload.data?.title || "MORE Energy ERP";
   const options = {
     body: payload.notification?.body || payload.data?.body || "لديك إشعار جديد",
-    icon: "/favicon.ico",
+    icon: "/more-power-more-energy.png",
     badge: "/favicon.ico",
-    data: payload.data || {},
+    dir: "rtl",
+    lang: "ar",
+    requireInteraction: payload.data?.requiresAction === "true",
+    renotify: true,
+    tag: payload.data?.notificationId || payload.data?.type || "more-energy-notification",
+    data: {
+      ...(payload.data || {}),
+      clickUrl: payload.data?.clickUrl || payload.fcmOptions?.link || "/notifications",
+    },
   };
   event.waitUntil(self.registration.showNotification(title, options));
 });
 
 self.addEventListener("notificationclick", (event) => {
   event.notification.close();
-  const relatedId = event.notification.data?.relatedEntityId;
-  const url = relatedId ? `/marketer/orders/${relatedId}` : "/notifications";
-  event.waitUntil(clients.openWindow(url));
+  const targetUrl = new URL(event.notification.data?.clickUrl || "/notifications", self.location.origin).href;
+
+  event.waitUntil(
+    clients.matchAll({ type: "window", includeUncontrolled: true }).then((clientList) => {
+      for (const client of clientList) {
+        if ("focus" in client) {
+          client.navigate?.(targetUrl);
+          return client.focus();
+        }
+      }
+      return clients.openWindow(targetUrl);
+    }),
+  );
 });

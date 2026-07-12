@@ -131,9 +131,18 @@ export async function getDashboardStats(viewer: UserProfile): Promise<DashboardS
 
   const orders = await listOrders(viewer);
   const expenses = await listExpenses();
-  const totalSales = orders
-    .filter((order) => order.status === "COMPLETED")
-    .reduce((sum, order) => sum + order.finalPrice * order.quantity, 0);
+  const paidOrders = orders.filter(
+    (order) =>
+      order.isPaymentCollected ||
+      ["PAYMENT_CONFIRMED", "COMMISSION_PENDING", "COMPLETED"].includes(order.status),
+  );
+  const orderTotal = (order: Order) => order.finalPrice * order.quantity;
+  const cashCollected = (order: Order) => {
+    if (order.collectedAmount !== undefined) return order.collectedAmount + order.payment.depositAmount;
+    return orderTotal(order);
+  };
+  const totalSales = paidOrders.reduce((sum, order) => sum + orderTotal(order), 0);
+  const collectedCash = paidOrders.reduce((sum, order) => sum + cashCollected(order), 0);
   const paidCommissions = orders
     .filter((order) => order.commissionStatus === "PAID")
     .reduce((sum, order) => sum + order.commissionAmount, 0);
@@ -149,7 +158,7 @@ export async function getDashboardStats(viewer: UserProfile): Promise<DashboardS
   return {
     totalSales,
     grossProfit: totalSales - paidCommissions - expenseTotal,
-    netCash: totalSales - expenseTotal,
+    netCash: collectedCash - expenseTotal,
     pendingCommissions,
     approvedCommissions,
     paidCommissions,
@@ -189,13 +198,28 @@ export async function createNotification(
     const tokens = tokenSnap.docs.map((doc) => doc.data().token).filter(Boolean);
     const messaging = getAdminMessaging();
     if (!messaging || !tokens.length) return;
+    const targetPath = notificationTargetPath(notification);
+    const clickUrl = `/notifications/open?id=${encodeURIComponent(ref.id)}&to=${encodeURIComponent(targetPath)}`;
     const response = await messaging.sendEachForMulticast({
       tokens,
       notification: { title: notification.title, body: notification.body },
       data: {
         notificationId: ref.id,
         type: notification.type,
+        title: notification.title,
+        body: notification.body,
+        clickUrl,
+        requiresAction: notification.requiresAction ? "true" : "false",
         relatedEntityId: notification.relatedEntityId ?? "",
+      },
+      webpush: {
+        notification: {
+          icon: "/more-power-more-energy.png",
+          badge: "/favicon.ico",
+          requireInteraction: notification.requiresAction,
+          renotify: true,
+          tag: `${notification.type}-${notification.relatedEntityId ?? ref.id}`,
+        },
       },
     });
     await Promise.all(
@@ -208,6 +232,29 @@ export async function createNotification(
   } catch {
     // Firestore notification is already saved; push failure must not rollback the business event.
   }
+}
+
+function notificationTargetPath(notification: Omit<NotificationItem, "id" | "createdAt" | "isRead">) {
+  const role = notification.recipientRole;
+  const entityId = notification.relatedEntityId;
+
+  if (notification.relatedEntityType === "order" && entityId) {
+    if (role === "admin") return `/admin/orders/${entityId}`;
+    if (role === "coordinator") return `/coordinator/orders/${entityId}`;
+    return `/marketer/orders/${entityId}`;
+  }
+  if (notification.relatedEntityType === "product" && entityId) {
+    if (role === "admin") return `/admin/products/${entityId}`;
+    if (role === "coordinator") return `/coordinator/products/${entityId}`;
+    return `/marketer/products/${entityId}`;
+  }
+  if (notification.relatedEntityType === "user") return "/admin/users";
+  if (notification.relatedEntityType === "commission") {
+    return role === "admin" ? "/admin/commissions" : "/marketer/commissions";
+  }
+  if (notification.type === "TARGET_UPDATED") return role === "admin" ? "/admin/targets" : "/marketer/target";
+  if (notification.type === "EXPENSE_CREATED") return "/admin/expenses";
+  return "/notifications";
 }
 
 export function roleCanManageProducts(role: Role) {

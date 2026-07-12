@@ -109,6 +109,21 @@ export const targetSchema = z.object({
   targetAmount: z.coerce.number().min(0),
 });
 
+export const commissionSettingsSchema = z.object({
+  marketerId: z.string().min(1, "اختر المسوق"),
+  commissionType: z.enum(["FIXED", "PERCENTAGE"]),
+  commissionValue: z.coerce.number().min(0, "قيمة العمولة غير صحيحة"),
+});
+
+export const resetCommissionsSchema = z.object({
+  month: z.coerce.number().int().min(1).max(12),
+  year: z.coerce.number().int().min(2024).max(2100),
+});
+
+export const resetTargetSchema = z.object({
+  targetId: z.string().min(1, "الهدف غير صحيح"),
+});
+
 export const cloudinaryUploadSchema = z.object({
   folder: z.enum(["products", "orders", "shipping", "receipts", "deposits", "scrap", "expenses"]),
   fileType: z.string().regex(/^(image\/(png|jpeg|jpg|webp)|application\/pdf)$/),

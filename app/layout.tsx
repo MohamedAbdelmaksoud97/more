@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { IBM_Plex_Sans_Arabic } from "next/font/google";
 import { Suspense } from "react";
 import { RouteProgress } from "@/components/erp/route-progress";
@@ -13,6 +13,20 @@ const ibmPlexArabic = IBM_Plex_Sans_Arabic({
 export const metadata: Metadata = {
   title: "MORE Energy ERP",
   description: "نظام إدارة موارد مور لأعمال الطاقة",
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    title: "MORE ERP",
+    statusBarStyle: "default",
+  },
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/more-power-more-energy.png",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#1d4ed8",
 };
 
 export default function RootLayout({

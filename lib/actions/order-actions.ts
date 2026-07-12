@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { requireRole } from "@/lib/auth";
 import { getAdminDb, hasFirebaseAdminConfig } from "@/lib/firebase/admin";
 import { orderDecisionSchema, orderSchema, statusUpdateSchema } from "@/lib/schemas";
-import type { Order, OrderStatus, Product, StockRecord } from "@/lib/types";
+import type { Order, OrderStatus, Product, StockRecord, UserProfile } from "@/lib/types";
 import { createNotification, getOrder, writeAudit } from "@/lib/data/repository";
 
 const completionStatuses: OrderStatus[] = [
@@ -29,7 +29,6 @@ function commissionCanBeApproved(order: Order) {
     !["FAILED_DELIVERY", "RETURNED_PENDING_STOCK", "RETURNED_TO_STOCK"].includes(order.status)
   );
 }
-
 function updateStock(stock: StockRecord[], location: string, quantity: number, mode: "reserve" | "sell" | "return") {
   return stock.map((record) => {
     if (record.location !== location) return record;
@@ -66,6 +65,17 @@ function createOrderNumber(docId: string) {
   const month = String(now.getMonth() + 1).padStart(2, "0");
   const day = String(now.getDate()).padStart(2, "0");
   return `MORE-${year}${month}${day}-${docId.slice(0, 5).toUpperCase()}`;
+}
+
+function orderTotal(order: Pick<Order, "finalPrice" | "quantity">) {
+  return order.finalPrice * order.quantity;
+}
+
+function calculateCommission(marketer: Pick<UserProfile, "commissionType" | "commissionValue"> | null, total: number) {
+  const value = Number(marketer?.commissionValue ?? 0);
+  if (!value) return 0;
+  if (marketer?.commissionType === "FIXED") return value;
+  return Math.round((total * value) / 100);
 }
 
 export async function createOrderAction(_state: OrderActionState, formData: FormData): Promise<OrderActionState> {
@@ -365,85 +375,153 @@ export async function confirmDeliveryPaymentAction(_state: OrderActionState, for
 
     const db = getAdminDb();
     if (!db) return { ok: false, message: "Firebase Admin غير مهيأ" };
-    const ref = db.collection("orders").doc(parsed.data.orderId);
-    const snap = await ref.get();
-    if (!snap.exists) return { ok: false, message: "الطلب غير موجود" };
 
-    const order = { id: snap.id, ...snap.data() } as Order;
-    if (!["SHIPPED", "DELIVERED_PENDING_CONFIRMATION", "PAYMENT_CONFIRMED"].includes(order.status)) {
-      return { ok: false, message: "يمكن تأكيد التسليم والتحصيل بعد رفع بوليصة الشحن فقط" };
-    }
+    const now = new Date();
+    const nowIso = now.toISOString();
+    const result: { beforeOrder?: Order; updatedOrder?: Order } = {};
+    let commissionAmount = 0;
+    let targetUpdated = false;
 
-    const receiptField = parsed.data.documentUrl
-      ? { deliveryReceiptByCoordinatorUrl: parsed.data.documentUrl }
-      : {};
+    await db.runTransaction(async (tx) => {
+      const ref = db.collection("orders").doc(parsed.data.orderId);
+      const snap = await tx.get(ref);
+      if (!snap.exists) throw new Error("الطلب غير موجود");
 
-    await ref.update({
-      ...receiptField,
-      status: "PAYMENT_CONFIRMED",
-      collectedAmount: parsed.data.collectedAmount,
-      isPaymentCollected: true,
-      updatedAt: new Date().toISOString(),
-      timeline: [
-        ...order.timeline,
-        {
-          label: "تم تأكيد التسليم واستلام المبلغ",
-          actorName: user.name,
-          at: new Date().toISOString(),
-          details: `المبلغ المستلم: ${parsed.data.collectedAmount}`,
-        },
-      ],
+      const current = { id: snap.id, ...snap.data() } as Order;
+      if (!["SHIPPED", "DELIVERED_PENDING_CONFIRMATION", "PAYMENT_CONFIRMED"].includes(current.status)) {
+        throw new Error("يمكن تأكيد التسليم والتحصيل بعد رفع بوليصة الشحن فقط");
+      }
+      if (current.isPaymentCollected) {
+        throw new Error("تم تأكيد تحصيل هذا الطلب مسبقا");
+      }
+
+      const marketerSnap = await tx.get(db.collection("users").doc(current.marketerId));
+      const marketer = marketerSnap.exists ? ({ uid: marketerSnap.id, ...marketerSnap.data() } as UserProfile) : null;
+      const total = orderTotal(current);
+      commissionAmount = calculateCommission(marketer, total);
+
+      const targetId = `${current.marketerId}_${now.getUTCFullYear()}_${now.getUTCMonth() + 1}`;
+      const targetRef = db.collection("targets").doc(targetId);
+      const targetSnap = await tx.get(targetRef);
+      if (targetSnap.exists) {
+        const target = targetSnap.data();
+        const achievedAmount = Number(target?.achievedAmount ?? 0) + total;
+        tx.update(targetRef, {
+          achievedAmount,
+          remainingAmount: Math.max(0, Number(target?.targetAmount ?? 0) - achievedAmount),
+          updatedAt: nowIso,
+          updatedBy: user.uid,
+        });
+        targetUpdated = true;
+      }
+
+      const receiptField = parsed.data.documentUrl
+        ? { deliveryReceiptByCoordinatorUrl: parsed.data.documentUrl }
+        : {};
+      const update = {
+        ...receiptField,
+        status: "PAYMENT_CONFIRMED" as const,
+        collectedAmount: parsed.data.collectedAmount,
+        isPaymentCollected: true,
+        commissionStatus: "PENDING" as const,
+        commissionAmount,
+        updatedAt: nowIso,
+        timeline: [
+          ...current.timeline,
+          {
+            label: "تم تأكيد التسليم واستلام المبلغ",
+            actorName: user.name,
+            at: nowIso,
+            details: `المبلغ المستلم: ${parsed.data.collectedAmount}`,
+          },
+          {
+            label: "تم احتساب العمولة كقيد معلق",
+            actorName: user.name,
+            at: nowIso,
+            details: `العمولة: ${commissionAmount}`,
+          },
+        ],
+      };
+
+      result.beforeOrder = current;
+      result.updatedOrder = { ...current, ...update };
+      tx.update(ref, withoutUndefined(update));
     });
+
+    if (!result.beforeOrder || !result.updatedOrder) return { ok: false, message: "تعذر تحديث الطلب" };
+    const beforeOrder = result.beforeOrder;
+    const updatedOrder = result.updatedOrder;
 
     await writeAudit({
       actorUserId: user.uid,
       actorRole: user.role,
       action: "order.delivery_payment_confirmed",
       entityType: "order",
-      entityId: order.id,
+      entityId: updatedOrder.id,
       before: withoutUndefined({
-        status: order.status,
-        collectedAmount: order.collectedAmount,
-        isPaymentCollected: order.isPaymentCollected,
+        status: beforeOrder.status,
+        collectedAmount: beforeOrder.collectedAmount,
+        isPaymentCollected: beforeOrder.isPaymentCollected,
+        commissionStatus: beforeOrder.commissionStatus,
+        commissionAmount: beforeOrder.commissionAmount,
       }),
       after: withoutUndefined({
         status: "PAYMENT_CONFIRMED",
         collectedAmount: parsed.data.collectedAmount,
         isPaymentCollected: true,
+        commissionStatus: "PENDING",
+        commissionAmount,
+        targetUpdated,
       }),
     });
     await createNotification({
       title: "تم تأكيد التسليم والتحصيل",
-      body: `تم تأكيد تسليم طلب ${order.productName} واستلام المبلغ`,
+      body: `تم تأكيد تسليم طلب ${updatedOrder.productName} واستلام المبلغ`,
       type: "ORDER_PAYMENT_CONFIRMED",
       recipientRole: "admin",
       actorUserId: user.uid,
       actorName: user.name,
       relatedEntityType: "order",
-      relatedEntityId: order.id,
+      relatedEntityId: updatedOrder.id,
       requiresAction: false,
     });
-    if (user.uid !== order.marketerId) {
+    if (user.uid !== updatedOrder.marketerId) {
       await createNotification({
         title: "تم تأكيد تحصيل الطلب",
-        body: `تم تأكيد تحصيل طلب ${order.productName}`,
+        body: `تم تأكيد تحصيل طلب ${updatedOrder.productName}`,
         type: "ORDER_PAYMENT_CONFIRMED",
-        recipientUserId: order.marketerId,
+        recipientUserId: updatedOrder.marketerId,
         actorUserId: user.uid,
         actorName: user.name,
         relatedEntityType: "order",
-        relatedEntityId: order.id,
+        relatedEntityId: updatedOrder.id,
         requiresAction: false,
       });
     }
+    await createNotification({
+      title: "عمولة معلقة جديدة",
+      body: `تم احتساب عمولة ${commissionAmount} ج.م على طلب ${updatedOrder.productName}`,
+      type: "COMMISSION_PENDING",
+      recipientUserId: updatedOrder.marketerId,
+      actorUserId: user.uid,
+      actorName: user.name,
+      relatedEntityType: "order",
+      relatedEntityId: updatedOrder.id,
+      requiresAction: false,
+    });
 
-    revalidatePath(`/admin/orders/${order.id}`);
-    revalidatePath(`/coordinator/orders/${order.id}`);
-    revalidatePath(`/marketer/orders/${order.id}`);
+    revalidatePath(`/admin/orders/${updatedOrder.id}`);
+    revalidatePath(`/coordinator/orders/${updatedOrder.id}`);
+    revalidatePath(`/marketer/orders/${updatedOrder.id}`);
     revalidatePath("/admin/orders");
     revalidatePath("/coordinator/orders");
     revalidatePath("/marketer/orders");
-    return { ok: true, message: "تم تأكيد التسليم واستلام المبلغ" };
+    revalidatePath("/admin/commissions");
+    revalidatePath("/marketer/commissions");
+    revalidatePath("/admin/targets");
+    revalidatePath("/marketer/target");
+    revalidatePath("/admin/dashboard");
+    return { ok: true, message: "تم تأكيد التسليم واستلام المبلغ واحتساب العمولة" };
   } catch (error) {
     const message = error instanceof Error ? error.message : "تعذر تأكيد التسليم والتحصيل";
     return { ok: false, message };

@@ -1,26 +1,57 @@
 import { PageHeader } from "@/components/erp/app-shell";
+import { CommissionSettingsForm, MonthlyCommissionResetForm } from "@/components/forms/commission-admin-forms";
+import { Panel } from "@/components/ui/cards";
 import { DataTable } from "@/components/ui/table";
 import { commissionStatusLabels } from "@/lib/constants";
 import { requireRole } from "@/lib/auth";
-import { listOrders } from "@/lib/data/repository";
+import { listOrders, listUsers } from "@/lib/data/repository";
 import { formatCurrency, formatOrderNumber } from "@/lib/utils";
 
 export default async function AdminCommissionsPage() {
   const user = await requireRole(["admin"]);
-  const orders = await listOrders(user);
+  const [orders, users] = await Promise.all([listOrders(user), listUsers()]);
+  const marketers = users.filter((item) => item.role === "marketer");
+
   return (
-    <>
-      <PageHeader title="العمولات" description="العمولة لا تعتمد إلا بعد اكتمال التسليم والتحصيل والإيصالات." />
-      <DataTable headers={["الطلب", "المسوق", "الحالة", "القيمة"]}>
-        {orders.map((order) => (
-          <tr key={order.id}>
-            <td className="px-4 py-3 font-bold">{formatOrderNumber(order)}</td>
-            <td className="px-4 py-3">{order.marketerName}</td>
-            <td className="px-4 py-3">{commissionStatusLabels[order.commissionStatus]}</td>
-            <td className="px-4 py-3">{formatCurrency(order.commissionAmount)}</td>
-          </tr>
-        ))}
-      </DataTable>
-    </>
+    <div className="grid gap-6">
+      <PageHeader title="العمولات" description="تحديد عمولة كل مسوق ومتابعة العمولات المتوقعة والمعلقة والمعتمدة." />
+
+      <Panel title="إعداد عمولة المسوق" description="اختر مسوقا وحدد عمولة ثابتة أو نسبة مئوية من قيمة الطلب المحصل.">
+        <CommissionSettingsForm marketers={marketers} />
+      </Panel>
+
+      <Panel title="تصفير العمولات الشهرية" description="يصفر العمولات المتوقعة والمعلقة والمعتمدة للشهر المحدد دون حذف الطلبات.">
+        <MonthlyCommissionResetForm />
+      </Panel>
+
+      <Panel title="إعدادات المسوقين الحالية">
+        <DataTable headers={["المسوق", "نوع العمولة", "القيمة"]}>
+          {marketers.map((marketer) => (
+            <tr key={marketer.uid}>
+              <td className="px-4 py-3 font-bold">{marketer.name}</td>
+              <td className="px-4 py-3">{marketer.commissionType === "FIXED" ? "مبلغ ثابت" : "نسبة مئوية"}</td>
+              <td className="px-4 py-3">
+                {marketer.commissionType === "FIXED"
+                  ? formatCurrency(marketer.commissionValue ?? 0)
+                  : `${marketer.commissionValue ?? 0}%`}
+              </td>
+            </tr>
+          ))}
+        </DataTable>
+      </Panel>
+
+      <Panel title="سجل عمولات الطلبات">
+        <DataTable headers={["الطلب", "المسوق", "الحالة", "القيمة"]}>
+          {orders.map((order) => (
+            <tr key={order.id}>
+              <td className="px-4 py-3 font-bold">{formatOrderNumber(order)}</td>
+              <td className="px-4 py-3">{order.marketerName}</td>
+              <td className="px-4 py-3">{commissionStatusLabels[order.commissionStatus]}</td>
+              <td className="px-4 py-3">{formatCurrency(order.commissionAmount)}</td>
+            </tr>
+          ))}
+        </DataTable>
+      </Panel>
+    </div>
   );
 }
