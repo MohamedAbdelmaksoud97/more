@@ -248,7 +248,8 @@ export function ProductForm({ product }: { product?: Product }) {
                 className="mt-3"
                 type="number"
                 min={0}
-                value={record.available}
+                value={record.available === 0 ? "" : record.available}
+                placeholder="0"
                 onChange={(event) => updateAvailable(record.location, event.currentTarget.value)}
               />
               <div className="mt-3 grid grid-cols-3 gap-2 text-center text-[11px] font-bold text-slate-500">
