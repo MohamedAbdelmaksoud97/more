@@ -50,6 +50,18 @@ function timestampLikeToDate(value: unknown) {
   return null;
 }
 
+function dateMillis(value: unknown) {
+  if (!value) return 0;
+  const timestampDate = timestampLikeToDate(value);
+  if (timestampDate) return timestampDate.getTime();
+  if (value instanceof Date) return value.getTime();
+  if (typeof value === "string" || typeof value === "number") {
+    const parsed = new Date(value).getTime();
+    return Number.isNaN(parsed) ? 0 : parsed;
+  }
+  return 0;
+}
+
 function serializeFirestoreValue(value: unknown): unknown {
   const date = timestampLikeToDate(value);
   if (date) return date.toISOString();
@@ -64,7 +76,14 @@ function serializeFirestoreValue(value: unknown): unknown {
 }
 
 function fromDoc<T>(doc: FirebaseFirestore.DocumentSnapshot): T {
-  return serializeFirestoreValue({ id: doc.id, ...(doc.data() ?? {}) }) as T;
+  const record = serializeFirestoreValue({ id: doc.id, ...(doc.data() ?? {}) }) as Record<string, unknown>;
+  if (dateMillis(record.createdAt) === 0 && doc.createTime) {
+    record.createdAt = doc.createTime.toDate().toISOString();
+  }
+  if (dateMillis(record.updatedAt) === 0 && doc.updateTime) {
+    record.updatedAt = doc.updateTime.toDate().toISOString();
+  }
+  return record as T;
 }
 
 function withoutUndefined<T>(value: T): T {
@@ -79,28 +98,6 @@ function withoutUndefined<T>(value: T): T {
     ) as T;
   }
   return value;
-}
-
-function dateMillis(value: unknown) {
-  if (!value) return 0;
-  const timestampDate = timestampLikeToDate(value);
-  if (timestampDate) return timestampDate.getTime();
-  if (value instanceof Date) return value.getTime();
-  if (typeof value === "string" || typeof value === "number") {
-    const parsed = new Date(value).getTime();
-    return Number.isNaN(parsed) ? 0 : parsed;
-  }
-  if (typeof value === "object") {
-    const candidate = value as {
-      toDate?: () => Date;
-      seconds?: number;
-      _seconds?: number;
-    };
-    if (typeof candidate.toDate === "function") return candidate.toDate().getTime();
-    if (typeof candidate.seconds === "number") return candidate.seconds * 1000;
-    if (typeof candidate._seconds === "number") return candidate._seconds * 1000;
-  }
-  return 0;
 }
 
 export async function listUsers(): Promise<UserProfile[]> {
@@ -172,6 +169,23 @@ export async function listNotifications(viewer: UserProfile): Promise<Notificati
   const merged = new Map<string, NotificationItem>();
   [...byUser.docs, ...byRole.docs].forEach((doc) => merged.set(doc.id, fromDoc<NotificationItem>(doc)));
   return [...merged.values()].sort((a, b) => dateMillis(b.createdAt) - dateMillis(a.createdAt));
+}
+
+export async function markNotificationsRead(viewer: UserProfile) {
+  const db = dbOrNull();
+  if (!db) return;
+
+  const [byUser, byRole] = await Promise.all([
+    db.collection("notifications").where("recipientUserId", "==", viewer.uid).where("isRead", "==", false).get(),
+    db.collection("notifications").where("recipientRole", "==", viewer.role).where("isRead", "==", false).get(),
+  ]);
+  const refs = new Map<string, FirebaseFirestore.DocumentReference>();
+  [...byUser.docs, ...byRole.docs].forEach((doc) => refs.set(doc.id, doc.ref));
+  if (!refs.size) return;
+
+  const batch = db.batch();
+  refs.forEach((ref) => batch.update(ref, { isRead: true }));
+  await batch.commit();
 }
 
 export async function listTargets(): Promise<Target[]> {

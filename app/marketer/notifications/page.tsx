@@ -1,10 +1,11 @@
 import { PageHeader } from "@/components/erp/app-shell";
 import { NotificationPageContent } from "@/components/erp/notification-page-content";
 import { requireRole } from "@/lib/auth";
-import { listNotifications } from "@/lib/data/repository";
+import { listNotifications, markNotificationsRead } from "@/lib/data/repository";
 
 export default async function MarketerNotificationsPage() {
   const user = await requireRole(["marketer", "admin"]);
+  await markNotificationsRead(user);
   const notifications = await listNotifications(user);
   return (
     <>
