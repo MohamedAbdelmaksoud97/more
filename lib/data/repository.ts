@@ -40,6 +40,20 @@ function dbOrNull() {
   return getAdminDb();
 }
 
+function withoutUndefined<T>(value: T): T {
+  if (Array.isArray(value)) {
+    return value.map((item) => withoutUndefined(item)).filter((item) => item !== undefined) as T;
+  }
+  if (value && typeof value === "object") {
+    return Object.fromEntries(
+      Object.entries(value as Record<string, unknown>)
+        .filter(([, item]) => item !== undefined)
+        .map(([key, item]) => [key, withoutUndefined(item)]),
+    ) as T;
+  }
+  return value;
+}
+
 export async function listUsers(): Promise<UserProfile[]> {
   const db = dbOrNull();
   if (!db) return demoUsers;
@@ -180,12 +194,28 @@ export async function createNotification(
   const db = dbOrNull();
   if (!db) return;
 
+  await saveAndPushNotification(db, notification);
+
+  if (notification.recipientRole !== "admin") {
+    await saveAndPushNotification(db, {
+      ...notification,
+      recipientUserId: undefined,
+      recipientRole: "admin",
+      requiresAction: false,
+    });
+  }
+}
+
+async function saveAndPushNotification(
+  db: FirebaseFirestore.Firestore,
+  notification: Omit<NotificationItem, "id" | "createdAt" | "isRead">,
+) {
   const payload = {
     ...notification,
     isRead: false,
     createdAt: FieldValue.serverTimestamp(),
   };
-  const ref = await db.collection("notifications").add(payload);
+  const ref = await db.collection("notifications").add(withoutUndefined(payload));
 
   try {
     const tokenQuery = notification.recipientUserId

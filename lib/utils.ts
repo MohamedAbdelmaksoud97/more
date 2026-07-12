@@ -1,6 +1,8 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
+export const EGYPT_TIME_ZONE = "Africa/Cairo";
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
@@ -15,8 +17,16 @@ export function formatCurrency(value: number) {
 
 export function formatDate(value: string | Date) {
   return new Intl.DateTimeFormat("ar-EG", {
+    timeZone: EGYPT_TIME_ZONE,
     dateStyle: "medium",
     timeStyle: "short",
+  }).format(new Date(value));
+}
+
+export function formatDateOnly(value: string | Date) {
+  return new Intl.DateTimeFormat("ar-EG", {
+    timeZone: EGYPT_TIME_ZONE,
+    dateStyle: "medium",
   }).format(new Date(value));
 }
 
@@ -24,9 +34,15 @@ export function formatOrderNumber(order: { id: string; orderNumber?: string; cre
   if (order.orderNumber) return order.orderNumber;
   const date = order.createdAt ? new Date(order.createdAt) : new Date();
   const safeDate = Number.isNaN(date.getTime()) ? new Date() : date;
-  const year = safeDate.getFullYear();
-  const month = String(safeDate.getMonth() + 1).padStart(2, "0");
-  const day = String(safeDate.getDate()).padStart(2, "0");
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: EGYPT_TIME_ZONE,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(safeDate);
+  const year = parts.find((part) => part.type === "year")?.value ?? String(safeDate.getUTCFullYear());
+  const month = parts.find((part) => part.type === "month")?.value ?? String(safeDate.getUTCMonth() + 1).padStart(2, "0");
+  const day = parts.find((part) => part.type === "day")?.value ?? String(safeDate.getUTCDate()).padStart(2, "0");
   return `MORE-${year}${month}${day}-${order.id.slice(0, 5).toUpperCase()}`;
 }
 

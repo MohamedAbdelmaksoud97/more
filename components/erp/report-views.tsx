@@ -1,7 +1,7 @@
 import type { DashboardStats, Expense, Order, Product, Target, UserProfile } from "@/lib/types";
 import { DashboardCard, Panel } from "@/components/ui/cards";
 import { DataTable } from "@/components/ui/table";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, formatDateOnly } from "@/lib/utils";
 import { updateUserRoleAction } from "@/lib/actions/admin-actions";
 import { Button } from "@/components/ui/button";
 
@@ -121,7 +121,7 @@ export function ExpensesView({ expenses }: { expenses: Expense[] }) {
           <td className="px-4 py-3 font-bold">{expense.category}</td>
           <td className="px-4 py-3">{formatCurrency(expense.amount)}</td>
           <td className="px-4 py-3">{expense.note}</td>
-          <td className="px-4 py-3">{new Date(expense.createdAt).toLocaleDateString("ar-EG")}</td>
+          <td className="px-4 py-3">{formatDateOnly(expense.createdAt)}</td>
         </tr>
       ))}
     </DataTable>
