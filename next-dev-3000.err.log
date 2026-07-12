@@ -1724,3 +1724,151 @@ https://react.dev/link/hydration-mismatch
  
 [browser] [2026-07-12T13:19:15.904Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
 [browser] [2026-07-12T13:19:15.915Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+
+  ...
+    <LoadingBoundary name="login/" loading={null}>
+      <HTTPAccessFallbackBoundary notFound={undefined} forbidden={undefined} unauthorized={undefined}>
+        <RedirectBoundary>
+          <RedirectErrorBoundary router={{...}}>
+            <InnerLayoutRouter url="/login" tree={[...]} params={{}} cacheNode={{rsc:{...}, ...}} segmentPath={[...]} ...>
+              <SegmentViewNode type="page" pagePath="login/page...">
+                <SegmentTrieNode>
+                <LoginPage>
+                  <LoginForm>
+                    <AuthCard title="تسجيل الدخول" onSubmit={function submit} loading={false} error="" submitLabel="دخول">
+                      <div className="relative m...">
+                        <div className="mx-auto gr...">
+                          <section>
+                          <form onSubmit={function submit} className="rounded-2x...">
+                            <div>
+                            <div className="grid gap-4">
+                              <Field label="البريد الإ...">
+                                <label className="grid min-w...">
+                                  <span>
+                                  <Input name="email" type="email" required={true}>
+                                    <input
+                                      name="email"
+                                      type="email"
+                                      required={true}
+                                      className="h-10 w-full min-w-0 rounded-md border border-slate-200 bg-white px-3 ..."
+-                                     fdprocessedid="lwx6u"
+                                    >
+                              <Field label="كلمة المرور">
+                                <label className="grid min-w...">
+                                  <span>
+                                  <Input name="password" type="password" required={true} minLength={8}>
+                                    <input
+                                      name="password"
+                                      type="password"
+                                      required={true}
+                                      minLength={8}
+                                      className="h-10 w-full min-w-0 rounded-md border border-slate-200 bg-white px-3 ..."
+-                                     fdprocessedid="jpg1vi"
+                                    >
+                              <Button loading={false} type="submit" className="h-11">
+                                <button
+                                  className="inline-flex items-center justify-center gap-2 rounded-md px-4 text-sm fon..."
+                                  disabled={false}
+                                  type="submit"
+-                                 fdprocessedid="asjm59"
+                                >
+                              ...
+                            ...
+              ...
+            ...
+ 
+[browser] A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+
+  ...
+    <LoadingBoundary name="login/" loading={null}>
+      <HTTPAccessFallbackBoundary notFound={undefined} forbidden={undefined} unauthorized={undefined}>
+        <RedirectBoundary>
+          <RedirectErrorBoundary router={{...}}>
+            <InnerLayoutRouter url="/login" tree={[...]} params={{}} cacheNode={{rsc:{...}, ...}} segmentPath={[...]} ...>
+              <SegmentViewNode type="page" pagePath="login/page...">
+                <SegmentTrieNode>
+                <LoginPage>
+                  <LoginForm>
+                    <AuthCard title="تسجيل الدخول" onSubmit={function submit} loading={false} error="" submitLabel="دخول">
+                      <div className="relative m...">
+                        <div className="mx-auto gr...">
+                          <section>
+                          <form onSubmit={function submit} className="rounded-2x...">
+                            <div>
+                            <div className="grid gap-4">
+                              <Field label="البريد الإ...">
+                                <label className="grid min-w...">
+                                  <span>
+                                  <Input name="email" type="email" required={true}>
+                                    <input
+                                      name="email"
+                                      type="email"
+                                      required={true}
+                                      className="h-10 w-full min-w-0 rounded-md border border-slate-200 bg-white px-3 ..."
+-                                     fdprocessedid="lwx6u"
+                                    >
+                              <Field label="كلمة المرور">
+                                <label className="grid min-w...">
+                                  <span>
+                                  <Input name="password" type="password" required={true} minLength={8}>
+                                    <input
+                                      name="password"
+                                      type="password"
+                                      required={true}
+                                      minLength={8}
+                                      className="h-10 w-full min-w-0 rounded-md border border-slate-200 bg-white px-3 ..."
+-                                     fdprocessedid="jpg1vi"
+                                    >
+                              <Button loading={false} type="submit" className="h-11">
+                                <button
+                                  className="inline-flex items-center justify-center gap-2 rounded-md px-4 text-sm fon..."
+                                  disabled={false}
+                                  type="submit"
+-                                 fdprocessedid="asjm59"
+                                >
+                              ...
+                            ...
+              ...
+            ...
+ 
+[browser] [2026-07-12T17:55:43.796Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T17:55:43.803Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T17:55:53.719Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T17:55:53.720Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T17:56:05.971Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T17:56:05.972Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T17:56:24.263Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T17:56:24.264Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+TypeError: fetch failed
+    at ignore-listed frames {
+  [cause]: AggregateError: 
+      at ignore-listed frames {
+    code: 'ETIMEDOUT',
+    [errors]: [ [Error], [Error], [Error] ]
+  }
+}
+[browser] [2026-07-12T18:06:42.469Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T18:06:42.470Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T18:11:41.677Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T18:11:41.678Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
