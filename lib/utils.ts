@@ -39,5 +39,12 @@ export function isConfigured(value: string | undefined) {
 }
 
 export function safePrivateKey(value: string | undefined) {
-  return value?.replace(/\\n/g, "\n");
+  if (!value) return undefined;
+  const trimmed = value.trim();
+  const unquoted =
+    (trimmed.startsWith('"') && trimmed.endsWith('"')) ||
+    (trimmed.startsWith("'") && trimmed.endsWith("'"))
+      ? trimmed.slice(1, -1)
+      : trimmed;
+  return unquoted.replace(/\\n/g, "\n");
 }

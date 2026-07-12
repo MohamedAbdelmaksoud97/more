@@ -15,7 +15,9 @@ export class AuthorizationError extends Error {
 }
 
 export const getCurrentUser = cache(async (): Promise<UserProfile | null> => {
-  if (!hasFirebaseAdminConfig()) return demoCurrentUser;
+  if (!hasFirebaseAdminConfig()) {
+    return process.env.NODE_ENV === "production" ? null : demoCurrentUser;
+  }
 
   const cookieStore = await cookies();
   const headerStore = await headers();
