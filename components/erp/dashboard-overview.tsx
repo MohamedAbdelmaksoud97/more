@@ -16,6 +16,11 @@ export function DashboardOverview({
   products: Product[];
   targets?: Target[];
 }) {
+  const now = new Date();
+  const activeTarget =
+    targets?.find((target) => target.year === now.getUTCFullYear() && target.month === now.getUTCMonth() + 1) ??
+    targets?.[0];
+
   return (
     <div className="grid min-w-0 gap-6">
       <div className="grid min-w-0 gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -57,9 +62,9 @@ export function DashboardOverview({
               );
             })}
           </div>
-          {targets?.length ? (
+          {activeTarget ? (
             <div className="mt-4 rounded-md bg-amber-50 p-3 text-sm font-semibold text-amber-900">
-              الهدف النشط: {formatCurrency(targets[0].achievedAmount)} من {formatCurrency(targets[0].targetAmount)}
+              الهدف النشط: {formatCurrency(activeTarget.achievedAmount)} من {formatCurrency(activeTarget.targetAmount)}
             </div>
           ) : null}
         </Panel>

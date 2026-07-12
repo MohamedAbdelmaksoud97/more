@@ -169,6 +169,7 @@ export async function upsertTargetAction(_state: ActionState, formData: FormData
   revalidatePath("/admin/targets");
   revalidatePath("/admin/dashboard");
   revalidatePath("/marketer/target");
+  revalidatePath("/marketer/dashboard");
   return { ok: true, message: "تم حفظ الهدف" };
 }
 
@@ -322,5 +323,6 @@ export async function resetTargetAction(_state: ActionState, formData: FormData)
   revalidatePath("/admin/targets");
   revalidatePath("/admin/dashboard");
   revalidatePath("/marketer/target");
+  revalidatePath("/marketer/dashboard");
   return { ok: true, message: "تم تصفير الهدف" };
 }

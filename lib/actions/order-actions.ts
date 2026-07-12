@@ -534,6 +534,7 @@ export async function confirmDeliveryPaymentAction(_state: OrderActionState, for
     revalidatePath("/admin/targets");
     revalidatePath("/marketer/target");
     revalidatePath("/admin/dashboard");
+    revalidatePath("/marketer/dashboard");
     return { ok: true, message: "تم تأكيد التسليم واستلام المبلغ واحتساب العمولة" };
   } catch (error) {
     const message = error instanceof Error ? error.message : "تعذر تأكيد التسليم والتحصيل";

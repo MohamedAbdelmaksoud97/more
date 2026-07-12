@@ -31,6 +31,7 @@ export async function POST(request: Request) {
   if (parsed.data.idToken) {
     const decoded = await auth.verifyIdToken(parsed.data.idToken);
     uid = decoded.uid;
+    await auth.updateUser(uid, { displayName: parsed.data.name });
   } else {
     if (!parsed.data.password) {
       return NextResponse.json({ error: "كلمة المرور مطلوبة" }, { status: 400 });
@@ -72,7 +73,7 @@ export async function POST(request: Request) {
       role,
       status,
       emailVerified: authUser.emailVerified,
-      emailVerifiedAt: authUser.emailVerified ? now : undefined,
+      ...(authUser.emailVerified ? { emailVerifiedAt: now } : {}),
       fcmTokens: [],
       commissionType: "PERCENTAGE",
       commissionValue: 0,

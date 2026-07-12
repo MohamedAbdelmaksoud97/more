@@ -1588,3 +1588,139 @@ https://react.dev/link/hydration-mismatch
 [browser] [2026-07-12T12:40:34.744Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
 [browser] [2026-07-12T12:41:25.373Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
 [browser] [2026-07-12T12:41:25.374Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T13:08:45.008Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T13:08:45.014Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T13:09:20.765Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T13:09:20.766Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T13:09:23.683Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T13:09:23.684Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+
+  ...
+    <LoadingBoundary name="login/" loading={null}>
+      <HTTPAccessFallbackBoundary notFound={undefined} forbidden={undefined} unauthorized={undefined}>
+        <RedirectBoundary>
+          <RedirectErrorBoundary router={{...}}>
+            <InnerLayoutRouter url="/login" tree={[...]} params={{}} cacheNode={{rsc:{...}, ...}} segmentPath={[...]} ...>
+              <SegmentViewNode type="page" pagePath="login/page...">
+                <SegmentTrieNode>
+                <LoginPage>
+                  <LoginForm>
+                    <AuthCard title="تسجيل الدخول" onSubmit={function submit} loading={false} error="" submitLabel="دخول">
+                      <div className="relative m...">
+                        <div className="mx-auto gr...">
+                          <section>
+                          <form onSubmit={function submit} className="rounded-2x...">
+                            <div>
+                            <div className="grid gap-4">
+                              <Field label="البريد الإ...">
+                                <label className="grid min-w...">
+                                  <span>
+                                  <Input name="email" type="email" required={true}>
+                                    <input
+                                      name="email"
+                                      type="email"
+                                      required={true}
+                                      className="h-10 w-full min-w-0 rounded-md border border-slate-200 bg-white px-3 ..."
+-                                     fdprocessedid="zduilr"
+                                    >
+                              <Field label="كلمة المرور">
+                                <label className="grid min-w...">
+                                  <span>
+                                  <Input name="password" type="password" required={true} minLength={8}>
+                                    <input
+                                      name="password"
+                                      type="password"
+                                      required={true}
+                                      minLength={8}
+                                      className="h-10 w-full min-w-0 rounded-md border border-slate-200 bg-white px-3 ..."
+-                                     fdprocessedid="w7p12p"
+                                    >
+                              <Button loading={false} type="submit" className="h-11">
+                                <button
+                                  className="inline-flex items-center justify-center gap-2 rounded-md px-4 text-sm fon..."
+                                  disabled={false}
+                                  type="submit"
+-                                 fdprocessedid="m72i0q"
+                                >
+                              ...
+                            ...
+              ...
+            ...
+ 
+[browser] A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+
+  ...
+    <LoadingBoundary name="login/" loading={null}>
+      <HTTPAccessFallbackBoundary notFound={undefined} forbidden={undefined} unauthorized={undefined}>
+        <RedirectBoundary>
+          <RedirectErrorBoundary router={{...}}>
+            <InnerLayoutRouter url="/login" tree={[...]} params={{}} cacheNode={{rsc:{...}, ...}} segmentPath={[...]} ...>
+              <SegmentViewNode type="page" pagePath="login/page...">
+                <SegmentTrieNode>
+                <LoginPage>
+                  <LoginForm>
+                    <AuthCard title="تسجيل الدخول" onSubmit={function submit} loading={false} error="" submitLabel="دخول">
+                      <div className="relative m...">
+                        <div className="mx-auto gr...">
+                          <section>
+                          <form onSubmit={function submit} className="rounded-2x...">
+                            <div>
+                            <div className="grid gap-4">
+                              <Field label="البريد الإ...">
+                                <label className="grid min-w...">
+                                  <span>
+                                  <Input name="email" type="email" required={true}>
+                                    <input
+                                      name="email"
+                                      type="email"
+                                      required={true}
+                                      className="h-10 w-full min-w-0 rounded-md border border-slate-200 bg-white px-3 ..."
+-                                     fdprocessedid="g85t44"
+                                    >
+                              <Field label="كلمة المرور">
+                                <label className="grid min-w...">
+                                  <span>
+                                  <Input name="password" type="password" required={true} minLength={8}>
+                                    <input
+                                      name="password"
+                                      type="password"
+                                      required={true}
+                                      minLength={8}
+                                      className="h-10 w-full min-w-0 rounded-md border border-slate-200 bg-white px-3 ..."
+-                                     fdprocessedid="wwl4wv"
+                                    >
+                              <Button loading={false} type="submit" className="h-11">
+                                <button
+                                  className="inline-flex items-center justify-center gap-2 rounded-md px-4 text-sm fon..."
+                                  disabled={false}
+                                  type="submit"
+-                                 fdprocessedid="qfkggm"
+                                >
+                              ...
+                            ...
+              ...
+            ...
+ 
+[browser] [2026-07-12T13:19:15.904Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T13:19:15.915Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 

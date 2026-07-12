@@ -7,6 +7,7 @@ import {
   createUserWithEmailAndPassword,
   sendEmailVerification,
   signInWithEmailAndPassword,
+  updateProfile,
 } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, MailCheck } from "lucide-react";
@@ -170,6 +171,8 @@ export function RegisterForm() {
 
     try {
       const credential = await createUserWithEmailAndPassword(auth, String(payload.email), String(payload.password));
+      await updateProfile(credential.user, { displayName: String(payload.name) });
+      await sendVerificationEmail(credential.user);
       const token = await credential.user.getIdToken(true);
       const response = await fetch("/api/register", {
         method: "POST",
@@ -178,7 +181,6 @@ export function RegisterForm() {
       });
       const result = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(result.error ?? "تعذر تسجيل الحساب");
-      await sendVerificationEmail(credential.user);
       router.push(result.status === "APPROVED" ? "/login" : "/verify-email");
     } catch (error) {
       const code = getErrorCode(error);

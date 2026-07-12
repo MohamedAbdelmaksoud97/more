@@ -35,7 +35,7 @@ export async function POST(request: Request) {
         ? "PENDING_ADMIN_APPROVAL"
         : "PENDING_EMAIL_VERIFICATION"
       : "APPROVED";
-    const name = authUser.displayName || authUser.email?.split("@")[0] || "مستخدم جديد";
+    const name = authUser.displayName || "مستخدم جديد";
 
     await userRef.set({
       uid: decoded.uid,
