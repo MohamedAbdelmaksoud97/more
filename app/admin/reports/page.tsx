@@ -1,20 +1,58 @@
 import { PageHeader } from "@/components/erp/app-shell";
 import { ReportsView } from "@/components/erp/report-views";
 import { requireRole } from "@/lib/auth";
-import { getDashboardStats, listOrders, listProducts } from "@/lib/data/repository";
+import { listExpenses, listOrders, listProducts, listTargets, listUsers } from "@/lib/data/repository";
 
-export default async function AdminReportsPage() {
+function currentEgyptMonth() {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Africa/Cairo",
+    year: "numeric",
+    month: "numeric",
+  }).formatToParts(new Date());
+  return {
+    month: Number(parts.find((part) => part.type === "month")?.value ?? new Date().getMonth() + 1),
+    year: Number(parts.find((part) => part.type === "year")?.value ?? new Date().getFullYear()),
+  };
+}
+
+function safePeriod(params: { month?: string; year?: string }) {
+  const current = currentEgyptMonth();
+  const month = Number(params.month ?? current.month);
+  const year = Number(params.year ?? current.year);
+
+  return {
+    month: Number.isInteger(month) && month >= 1 && month <= 12 ? month : current.month,
+    year: Number.isInteger(year) && year >= 2024 && year <= 2100 ? year : current.year,
+  };
+}
+
+export default async function AdminReportsPage({ searchParams }: { searchParams: Promise<{ month?: string; year?: string }> }) {
   const user = await requireRole(["admin"]);
-  const [stats, orders, products] = await Promise.all([getDashboardStats(user), listOrders(user), listProducts()]);
-  const summary = encodeURIComponent(`ملخص MORE Energy: المبيعات ${stats.totalSales}، صافي النقدية ${stats.netCash}`);
+  const [params, orders, products, expenses, targets, users] = await Promise.all([
+    searchParams,
+    listOrders(user),
+    listProducts(),
+    listExpenses(),
+    listTargets(),
+    listUsers(),
+  ]);
+  const period = safePeriod(params);
+
   return (
     <>
       <PageHeader
-        title="التقارير المالية"
-        description="فلاتر التقارير قابلة للتوسعة حسب التاريخ والمسوق والمنسق والمنتج وحالة الطلب."
-        action={<a className="rounded-md bg-emerald-600 px-4 py-2 text-sm font-bold text-white" href={`https://wa.me/?text=${summary}`} target="_blank" rel="noreferrer">مشاركة واتساب</a>}
+        title="التقرير الشهري الشامل"
+        description="عين المدير على المبيعات، النقدية، العمولات، المصروفات، المخزون، الكهنة والمرتجعات."
       />
-      <ReportsView stats={stats} orders={orders} products={products} />
+      <ReportsView
+        orders={orders}
+        products={products}
+        expenses={expenses}
+        targets={targets}
+        users={users}
+        selectedMonth={period.month}
+        selectedYear={period.year}
+      />
     </>
   );
 }

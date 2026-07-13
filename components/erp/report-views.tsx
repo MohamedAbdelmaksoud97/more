@@ -1,42 +1,400 @@
-import type { DashboardStats, Expense, Order, Product, Target, UserProfile } from "@/lib/types";
+import type { Expense, Order, Product, Target, UserProfile } from "@/lib/types";
 import { DashboardCard, Panel } from "@/components/ui/cards";
 import { DataTable } from "@/components/ui/table";
-import { formatCurrency, formatDateOnly } from "@/lib/utils";
+import { formatCurrency, formatDateOnly, formatOrderNumber } from "@/lib/utils";
 import { updateUserRoleAction } from "@/lib/actions/admin-actions";
-import { Button } from "@/components/ui/button";
+import { Button, ButtonLink } from "@/components/ui/button";
+import { commissionStatusLabels, locationLabels, orderStatusLabels } from "@/lib/constants";
 
 export function ReportsView({
-  stats,
   orders,
   products,
+  expenses,
+  targets,
+  users,
+  selectedMonth,
+  selectedYear,
 }: {
-  stats: DashboardStats;
   orders: Order[];
   products: Product[];
+  expenses: Expense[];
+  targets: Target[];
+  users: UserProfile[];
+  selectedMonth: number;
+  selectedYear: number;
 }) {
+  const productById = new Map(products.map((product) => [product.id, product]));
+  const monthLabel = monthNames[selectedMonth - 1] ?? String(selectedMonth);
+  const monthlyOrders = orders.filter((order) => isEgyptMonth(order.createdAt, selectedMonth, selectedYear));
+  const monthlyFinancialOrders = orders.filter((order) => {
+    const isCollected =
+      order.isPaymentCollected ||
+      ["PAYMENT_CONFIRMED", "COMMISSION_PENDING", "COMPLETED"].includes(order.status);
+    return isCollected && isEgyptMonth(order.updatedAt, selectedMonth, selectedYear);
+  });
+  const monthlyExpenses = expenses.filter((expense) => isEgyptMonth(expense.createdAt, selectedMonth, selectedYear));
+  const monthlyTargets = targets.filter((target) => target.month === selectedMonth && target.year === selectedYear);
+
+  const orderTotal = (order: Order) => order.finalPrice * order.quantity;
+  const cashCollected = (order: Order) =>
+    order.collectedAmount !== undefined ? order.collectedAmount + order.payment.depositAmount : orderTotal(order);
+  const totalSales = monthlyFinancialOrders.reduce((sum, order) => sum + orderTotal(order), 0);
+  const collectedCash = monthlyFinancialOrders.reduce((sum, order) => sum + cashCollected(order), 0);
+  const costOfGoods = monthlyFinancialOrders.reduce((sum, order) => {
+    const product = productById.get(order.productId);
+    return sum + Number(product?.costPrice ?? 0) * order.quantity;
+  }, 0);
+  const paidCommissions = monthlyFinancialOrders
+    .filter((order) => order.commissionStatus === "PAID")
+    .reduce((sum, order) => sum + order.commissionAmount, 0);
+  const approvedCommissions = monthlyFinancialOrders
+    .filter((order) => order.commissionStatus === "APPROVED")
+    .reduce((sum, order) => sum + order.commissionAmount, 0);
+  const pendingCommissions = monthlyFinancialOrders
+    .filter((order) => ["EXPECTED", "PENDING"].includes(order.commissionStatus))
+    .reduce((sum, order) => sum + order.commissionAmount, 0);
+  const expenseTotal = monthlyExpenses.reduce((sum, expense) => sum + expense.amount, 0);
+  const grossProfit = totalSales - costOfGoods;
+  const netCash = collectedCash - expenseTotal - paidCommissions;
+  const scrapValue = monthlyFinancialOrders.reduce(
+    (sum, order) => sum + (order.scrap.confirmedValue ?? order.scrap.scrapEstimatedValue ?? 0),
+    0,
+  );
+  const returns = monthlyOrders.filter((order) => order.status.startsWith("RETURNED")).length;
+
+  const productRows = products
+    .map((product) => {
+      const productOrders = monthlyFinancialOrders.filter((order) => order.productId === product.id);
+      return {
+        product,
+        orders: productOrders.length,
+        quantity: productOrders.reduce((sum, order) => sum + order.quantity, 0),
+        sales: productOrders.reduce((sum, order) => sum + orderTotal(order), 0),
+        available: product.stock.reduce((sum, item) => sum + item.available, 0),
+        reserved: product.stock.reduce((sum, item) => sum + item.reserved, 0),
+      };
+    })
+    .filter((row) => row.orders > 0 || row.available > 0 || row.reserved > 0)
+    .sort((a, b) => b.sales - a.sales);
+
+  const marketerRows = users
+    .filter((user) => user.role === "marketer")
+    .map((marketer) => {
+      const marketerOrders = monthlyFinancialOrders.filter((order) => order.marketerId === marketer.uid);
+      const target = monthlyTargets.find((item) => item.marketerId === marketer.uid);
+      return {
+        marketer,
+        orders: marketerOrders.length,
+        sales: marketerOrders.reduce((sum, order) => sum + orderTotal(order), 0),
+        pending: marketerOrders
+          .filter((order) => ["EXPECTED", "PENDING"].includes(order.commissionStatus))
+          .reduce((sum, order) => sum + order.commissionAmount, 0),
+        approved: marketerOrders
+          .filter((order) => order.commissionStatus === "APPROVED")
+          .reduce((sum, order) => sum + order.commissionAmount, 0),
+        paid: marketerOrders
+          .filter((order) => order.commissionStatus === "PAID")
+          .reduce((sum, order) => sum + order.commissionAmount, 0),
+        target,
+      };
+    })
+    .filter((row) => row.orders > 0 || row.target);
+
+  const coordinatorRows = users
+    .filter((user) => user.role === "admin" || user.role === "coordinator")
+    .map((user) => {
+      const coordinatorOrders = monthlyFinancialOrders.filter((order) => order.coordinatorId === user.uid);
+      return {
+        user,
+        orders: coordinatorOrders.length,
+        sales: coordinatorOrders.reduce((sum, order) => sum + orderTotal(order), 0),
+        collected: coordinatorOrders.reduce((sum, order) => sum + cashCollected(order), 0),
+      };
+    })
+    .filter((row) => row.orders > 0)
+    .sort((a, b) => b.sales - a.sales);
+
+  const scrapOrders = monthlyFinancialOrders.filter((order) => order.scrap.hasScrap);
+  const whatsappSummary = encodeURIComponent(
+    [
+      `تقرير MORE Energy - ${monthLabel} ${selectedYear}`,
+      `إجمالي المبيعات: ${formatCurrency(totalSales)}`,
+      `النقدية المحصلة: ${formatCurrency(collectedCash)}`,
+      `صافي النقدية: ${formatCurrency(netCash)}`,
+      `عمولات معلقة: ${formatCurrency(pendingCommissions)}`,
+      `عمولات معتمدة: ${formatCurrency(approvedCommissions)}`,
+      `عمولات مدفوعة: ${formatCurrency(paidCommissions)}`,
+      `المصروفات: ${formatCurrency(expenseTotal)}`,
+      `الكهنة: ${formatCurrency(scrapValue)}`,
+      `عدد الطلبات: ${monthlyOrders.length}`,
+    ].join("\n"),
+  );
+
   return (
     <div className="grid gap-6">
+      <Panel
+        title={`تقرير ${monthLabel} ${selectedYear}`}
+        description="يتم تحديث التقرير تلقائيا من الطلبات والمصروفات والعمولات والمخزون الحالي."
+        action={
+          <a
+            className="inline-flex h-10 items-center justify-center rounded-md bg-emerald-600 px-4 text-sm font-bold text-white transition hover:bg-emerald-700"
+            href={`https://wa.me/?text=${whatsappSummary}`}
+            target="_blank"
+            rel="noreferrer"
+          >
+            مشاركة واتساب
+          </a>
+        }
+      >
+        <form action="/admin/reports" className="grid gap-3 md:grid-cols-[minmax(0,1fr)_180px_auto]">
+          <label className="grid gap-2 text-sm font-bold text-slate-700">
+            الشهر
+            <select
+              name="month"
+              defaultValue={selectedMonth}
+              className="h-11 rounded-md border border-slate-200 bg-white px-3 text-sm font-bold text-slate-950 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+            >
+              {monthNames.map((name, index) => (
+                <option key={name} value={index + 1}>
+                  {name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="grid gap-2 text-sm font-bold text-slate-700">
+            السنة
+            <input
+              name="year"
+              type="number"
+              min={2024}
+              max={2100}
+              defaultValue={selectedYear}
+              className="h-11 rounded-md border border-slate-200 bg-white px-3 text-sm font-bold text-slate-950 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+            />
+          </label>
+          <div className="grid content-end">
+            <Button type="submit">تحديث التقرير</Button>
+          </div>
+        </form>
+      </Panel>
+
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <DashboardCard label="إجمالي المبيعات" value={stats.totalSales} tone="blue" />
-        <DashboardCard label="إجمالي الربح" value={stats.grossProfit} tone="green" />
-        <DashboardCard label="الكهنة" value={stats.scrapValue} tone="yellow" />
-        <DashboardCard label="المرتجعات" value={stats.returns} tone="gray" />
+        <DashboardCard label="إجمالي المبيعات" value={totalSales} tone="blue" hint="الطلبات المحصلة خلال الشهر" />
+        <DashboardCard label="النقدية المحصلة" value={collectedCash} tone="green" hint="العربون + التحصيل عند التسليم" />
+        <DashboardCard label="صافي النقدية" value={netCash} tone="green" hint="بعد المصروفات والعمولات المدفوعة" />
+        <DashboardCard label="إجمالي الربح" value={grossProfit} tone="yellow" hint="قبل المصروفات والعمولات" />
+        <DashboardCard label="عمولات معلقة" value={pendingCommissions} tone="yellow" />
+        <DashboardCard label="عمولات معتمدة" value={approvedCommissions} tone="green" />
+        <DashboardCard label="عمولات مدفوعة" value={paidCommissions} tone="blue" />
+        <DashboardCard label="المصروفات" value={expenseTotal} tone="gray" />
+        <DashboardCard label="قيمة الكهنة" value={scrapValue} tone="yellow" />
+        <MetricCard label="طلبات جديدة" value={monthlyOrders.length} hint="كل الطلبات المنشأة خلال الشهر" />
+        <MetricCard label="طلبات محصلة" value={monthlyFinancialOrders.length} hint="دخلت في أرقام المبيعات والنقدية" />
+        <MetricCard label="مرتجعات" value={returns} hint="حسب حالة الطلب" tone="gray" />
       </div>
-      <Panel title="المبيعات حسب المنتج">
-        <DataTable headers={["المنتج", "عدد الطلبات", "إجمالي المبيعات", "المتاح"]}>
-          {products.map((product) => {
-            const productOrders = orders.filter((order) => order.productId === product.id);
-            return (
-              <tr key={product.id}>
-                <td className="px-4 py-3 font-bold">{product.name}</td>
-                <td className="px-4 py-3">{productOrders.length}</td>
-                <td className="px-4 py-3">{formatCurrency(productOrders.reduce((sum, order) => sum + order.finalPrice * order.quantity, 0))}</td>
-                <td className="px-4 py-3">{product.stock.reduce((sum, item) => sum + item.available, 0)}</td>
-              </tr>
-            );
-          })}
+
+      <Panel title="أحدث الطلبات المؤثرة في التقرير" description="هذه الطلبات هي التي دخلت في المبيعات والنقدية لهذا الشهر.">
+        <DataTable headers={["الطلب", "العميل", "المنتج", "المسوق", "الحالة", "العمولة", "القيمة", "فتح"]}>
+          {monthlyFinancialOrders.slice(0, 12).map((order) => (
+            <tr key={order.id}>
+              <td className="px-4 py-3 font-bold">{formatOrderNumber(order)}</td>
+              <td className="px-4 py-3">{order.customer.customerName}</td>
+              <td className="px-4 py-3">{order.productName}</td>
+              <td className="px-4 py-3">{order.marketerName}</td>
+              <td className="px-4 py-3">{orderStatusLabels[order.status]}</td>
+              <td className="px-4 py-3">{commissionStatusLabels[order.commissionStatus]}</td>
+              <td className="px-4 py-3">{formatCurrency(orderTotal(order))}</td>
+              <td className="px-4 py-3">
+                <ButtonLink href={`/admin/orders/${order.id}`} variant="secondary" className="h-9 text-xs">
+                  فتح
+                </ButtonLink>
+              </td>
+            </tr>
+          ))}
         </DataTable>
       </Panel>
+
+      <div className="grid gap-6 xl:grid-cols-2">
+        <Panel title="المبيعات حسب المنتج">
+          <DataTable headers={["المنتج", "طلبات", "كمية", "إجمالي المبيعات", "متاح", "محجوز"]}>
+            {productRows.map((row) => (
+              <tr key={row.product.id}>
+                <td className="px-4 py-3 font-bold">{row.product.name}</td>
+                <td className="px-4 py-3">{row.orders}</td>
+                <td className="px-4 py-3">{row.quantity}</td>
+                <td className="px-4 py-3">{formatCurrency(row.sales)}</td>
+                <td className="px-4 py-3">{row.available}</td>
+                <td className="px-4 py-3">{row.reserved}</td>
+              </tr>
+            ))}
+          </DataTable>
+        </Panel>
+
+        <Panel title="أداء المسوقين والتارجت">
+          <DataTable headers={["المسوق", "طلبات", "مبيعات", "معلقة", "معتمدة", "مدفوعة", "التارجت"]}>
+            {marketerRows.map((row) => (
+              <tr key={row.marketer.uid}>
+                <td className="px-4 py-3 font-bold">{row.marketer.name}</td>
+                <td className="px-4 py-3">{row.orders}</td>
+                <td className="px-4 py-3">{formatCurrency(row.sales)}</td>
+                <td className="px-4 py-3">{formatCurrency(row.pending)}</td>
+                <td className="px-4 py-3">{formatCurrency(row.approved)}</td>
+                <td className="px-4 py-3">{formatCurrency(row.paid)}</td>
+                <td className="px-4 py-3">
+                  {row.target ? `${formatCurrency(row.target.achievedAmount)} / ${formatCurrency(row.target.targetAmount)}` : "غير محدد"}
+                </td>
+              </tr>
+            ))}
+          </DataTable>
+        </Panel>
+      </div>
+
+      <div className="grid gap-6 xl:grid-cols-2">
+        <Panel title="أداء المدير/المنسق في العمليات">
+          <DataTable headers={["المستخدم", "الدور", "طلبات", "مبيعات", "نقدية محصلة"]}>
+            {coordinatorRows.map((row) => (
+              <tr key={row.user.uid}>
+                <td className="px-4 py-3 font-bold">{row.user.name}</td>
+                <td className="px-4 py-3">{row.user.role === "admin" ? "مدير" : "منسق"}</td>
+                <td className="px-4 py-3">{row.orders}</td>
+                <td className="px-4 py-3">{formatCurrency(row.sales)}</td>
+                <td className="px-4 py-3">{formatCurrency(row.collected)}</td>
+              </tr>
+            ))}
+          </DataTable>
+        </Panel>
+
+        <Panel title="المصروفات الشهرية">
+          <DataTable headers={["التصنيف", "القيمة", "الملاحظة", "التاريخ"]}>
+            {monthlyExpenses.map((expense) => (
+              <tr key={expense.id}>
+                <td className="px-4 py-3 font-bold">{expense.category}</td>
+                <td className="px-4 py-3">{formatCurrency(expense.amount)}</td>
+                <td className="px-4 py-3">{expense.note}</td>
+                <td className="px-4 py-3">{formatDateOnly(expense.createdAt)}</td>
+              </tr>
+            ))}
+          </DataTable>
+        </Panel>
+      </div>
+
+      <Panel title="تفصيل العمولات">
+        <DataTable headers={["الطلب", "المسوق", "الحالة", "قيمة العمولة", "قيمة الطلب"]}>
+          {monthlyFinancialOrders
+            .filter((order) => order.commissionAmount > 0 || order.commissionStatus !== "EXPECTED")
+            .map((order) => (
+              <tr key={order.id}>
+                <td className="px-4 py-3 font-bold">{formatOrderNumber(order)}</td>
+                <td className="px-4 py-3">{order.marketerName}</td>
+                <td className="px-4 py-3">{commissionStatusLabels[order.commissionStatus]}</td>
+                <td className="px-4 py-3">{formatCurrency(order.commissionAmount)}</td>
+                <td className="px-4 py-3">{formatCurrency(orderTotal(order))}</td>
+              </tr>
+            ))}
+        </DataTable>
+      </Panel>
+
+      <div className="grid gap-6 xl:grid-cols-2">
+        <Panel title="الكهنة والمرتجعات">
+          <DataTable headers={["الطلب", "المنتج", "نوع الكهنة", "قيمة الكهنة", "حالة الطلب"]}>
+            {scrapOrders.map((order) => (
+              <tr key={order.id}>
+                <td className="px-4 py-3 font-bold">{formatOrderNumber(order)}</td>
+                <td className="px-4 py-3">{order.productName}</td>
+                <td className="px-4 py-3">{order.scrap.scrapType ?? "غير محدد"}</td>
+                <td className="px-4 py-3">{formatCurrency(order.scrap.confirmedValue ?? order.scrap.scrapEstimatedValue ?? 0)}</td>
+                <td className="px-4 py-3">{orderStatusLabels[order.status]}</td>
+              </tr>
+            ))}
+          </DataTable>
+        </Panel>
+
+        <Panel title="المخزون الحالي حسب المنتج">
+          <DataTable headers={["المنتج", "المتاح", "المحجوز", "المباع", "مرتجع", "المواقع"]}>
+            {products.map((product) => (
+              <tr key={product.id}>
+                <td className="px-4 py-3 font-bold">{product.name}</td>
+                <td className="px-4 py-3">{product.stock.reduce((sum, item) => sum + item.available, 0)}</td>
+                <td className="px-4 py-3">{product.stock.reduce((sum, item) => sum + item.reserved, 0)}</td>
+                <td className="px-4 py-3">{product.stock.reduce((sum, item) => sum + item.sold, 0)}</td>
+                <td className="px-4 py-3">{product.stock.reduce((sum, item) => sum + item.returned, 0)}</td>
+                <td className="px-4 py-3">
+                  {product.stock
+                    .map((item) => `${locationLabels[item.location]}: ${item.available}`)
+                    .join("، ")}
+                </td>
+              </tr>
+            ))}
+          </DataTable>
+        </Panel>
+      </div>
+    </div>
+  );
+}
+
+const monthNames = [
+  "يناير",
+  "فبراير",
+  "مارس",
+  "أبريل",
+  "مايو",
+  "يونيو",
+  "يوليو",
+  "أغسطس",
+  "سبتمبر",
+  "أكتوبر",
+  "نوفمبر",
+  "ديسمبر",
+];
+
+function isEgyptMonth(value: unknown, month: number, year: number) {
+  const date = normalizeReportDate(value);
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Africa/Cairo",
+    year: "numeric",
+    month: "numeric",
+  }).formatToParts(date);
+  return (
+    Number(parts.find((part) => part.type === "month")?.value) === month &&
+    Number(parts.find((part) => part.type === "year")?.value) === year
+  );
+}
+
+function normalizeReportDate(value: unknown) {
+  if (value instanceof Date) return value;
+  if (typeof value === "string" || typeof value === "number") return new Date(value);
+  if (value && typeof value === "object") {
+    const candidate = value as { toDate?: () => Date; seconds?: number; _seconds?: number };
+    if (typeof candidate.toDate === "function") return candidate.toDate();
+    if (typeof candidate.seconds === "number") return new Date(candidate.seconds * 1000);
+    if (typeof candidate._seconds === "number") return new Date(candidate._seconds * 1000);
+  }
+  return new Date(0);
+}
+
+function MetricCard({
+  label,
+  value,
+  hint,
+  tone = "blue",
+}: {
+  label: string;
+  value: number;
+  hint?: string;
+  tone?: "blue" | "green" | "yellow" | "gray";
+}) {
+  const accents = {
+    blue: "border-r-blue-600",
+    green: "border-r-emerald-600",
+    yellow: "border-r-amber-500",
+    gray: "border-r-slate-400",
+  };
+
+  return (
+    <div className={`min-w-0 overflow-hidden rounded-lg border border-slate-200 border-r-4 bg-white p-4 shadow-sm ${accents[tone]}`}>
+      <p className="truncate text-sm font-semibold text-slate-500">{label}</p>
+      <p className="mt-3 break-words text-2xl font-black leading-tight text-slate-950">{value}</p>
+      {hint ? <p className="mt-2 text-xs text-slate-500">{hint}</p> : null}
     </div>
   );
 }
