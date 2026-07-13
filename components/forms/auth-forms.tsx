@@ -115,9 +115,10 @@ export function LoginForm() {
         if (result.status === "PENDING_EMAIL_VERIFICATION") {
           await sendVerificationEmail(credential.user);
           await syncEmailVerification(token);
+          router.push("/verify-email");
+          return;
         }
-        router.push("/verify-email");
-        return;
+        throw new Error(result.error ?? "تعذر إنشاء الجلسة");
       }
 
       const sync = await syncEmailVerification(token);

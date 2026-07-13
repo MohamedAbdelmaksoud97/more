@@ -85,7 +85,7 @@ export async function updateUserRoleAction(formData: FormData) {
 
 export async function createExpenseAction(_state: ActionState, formData: FormData): Promise<ActionState> {
   try {
-    const actor = await requireRole(["admin"]);
+    const actor = await requireRole(["admin", "coordinator"]);
     const parsed = expenseSchema.safeParse(Object.fromEntries(formData.entries()));
     if (!parsed.success) return { ok: false, message: "راجع بيانات المصروف", errors: parsed.error.flatten().fieldErrors };
     if (!hasFirebaseAdminConfig()) return { ok: true, message: "تم تسجيل المصروف في وضع العرض التجريبي" };
@@ -115,6 +115,7 @@ export async function createExpenseAction(_state: ActionState, formData: FormDat
       requiresAction: false,
     });
     revalidatePath("/admin/expenses");
+    revalidatePath("/coordinator/expenses");
     revalidatePath("/admin/dashboard");
     revalidatePath("/admin/reports");
     return { ok: true, message: "تم تسجيل المصروف" };

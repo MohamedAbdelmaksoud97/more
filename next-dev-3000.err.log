@@ -2148,3 +2148,561 @@ b.createdAt.localeCompare is not a function
 [browser] [2026-07-12T19:00:10.057Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
 [browser] [2026-07-12T19:00:36.091Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
 [browser] [2026-07-12T19:00:36.091Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T19:02:05.072Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+[browser] [2026-07-12T19:02:05.073Z]  @firebase/firestore: Firestore (12.16.0): Uncaught Error in snapshot listener: FirebaseError: [code=permission-denied]: Missing or insufficient permissions. 
+⚠ Fast Refresh had to perform a full reload when ./node_modules/next/dist/client/image-component.js changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload when ./node_modules/next/dist/client/image-component.js changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload when ./node_modules/next/dist/client/image-component.js changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload when ./node_modules/next/dist/client/image-component.js changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload when ./node_modules/next/dist/client/image-component.js changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload when ./node_modules/next/dist/client/image-component.js changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload when ./node_modules/next/dist/client/image-component.js changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload when ./node_modules/next/dist/client/image-component.js changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⨯ Error: 8 RESOURCE_EXHAUSTED: Quota exceeded.
+    at listExpenses (lib\data\repository.ts:201:88)
+    at getDashboardStats (lib\data\repository.ts:210:26)
+    at async AdminDashboardPage (app\admin\dashboard\page.tsx:8:37)
+  199 | ...
+  200 | ...
+> 201 | ...").orderBy("createdAt", "desc").limit(200).get();
+      |                                               ^
+  202 | ...nse>(doc));
+  203 | ...
+  204 | ... {
+  code: 8,
+  details: 'Quota exceeded.',
+  metadata: Metadata {
+    internalRepr: Map(1) { 'x-debug-tracking-id' => [Array] },
+    opaqueData: Map(0) {},
+    options: {}
+  },
+  digest: '3844721009'
+}
+⨯ Error: 8 RESOURCE_EXHAUSTED: Quota exceeded.
+    at listNotifications (lib\data\repository.ts:168:6)
+    at async AdminLayout (app\admin\layout.tsx:9:25)
+  166 |     .where("recipientRole", "==", viewer.role)
+  167 |     .limit(200)
+> 168 |     .get();
+      |      ^
+  169 |   const merged = new Map<string, NotificationItem>();
+  170 |   [...byUser.docs, ...byRole.docs].forEach((doc) => merged.set(doc.id, fromDoc<Notificati...
+  171 |   return [...merged.values()].sort((a, b) => dateMillis(b.createdAt) - dateMillis(a.creat... {
+  code: 8,
+  details: 'Quota exceeded.',
+  metadata: Metadata {
+    internalRepr: Map(1) { 'x-debug-tracking-id' => [Array] },
+    opaqueData: Map(0) {},
+    options: {}
+  },
+  digest: '2651820210'
+}
+⨯ Error: 8 RESOURCE_EXHAUSTED: Quota exceeded.
+    at listNotifications (lib\data\repository.ts:168:6)
+    at async AdminLayout (app\admin\layout.tsx:9:25)
+  166 |     .where("recipientRole", "==", viewer.role)
+  167 |     .limit(200)
+> 168 |     .get();
+      |      ^
+  169 |   const merged = new Map<string, NotificationItem>();
+  170 |   [...byUser.docs, ...byRole.docs].forEach((doc) => merged.set(doc.id, fromDoc<Notificati...
+  171 |   return [...merged.values()].sort((a, b) => dateMillis(b.createdAt) - dateMillis(a.creat... {
+  code: 8,
+  details: 'Quota exceeded.',
+  metadata: Metadata {
+    internalRepr: Map(1) { 'x-debug-tracking-id' => [Array] },
+    opaqueData: Map(0) {},
+    options: {}
+  },
+  digest: '2651820210'
+}
+⨯ Error: 8 RESOURCE_EXHAUSTED: Quota exceeded.
+    at listExpenses (lib\data\repository.ts:201:88)
+    at getDashboardStats (lib\data\repository.ts:210:26)
+    at async AdminDashboardPage (app\admin\dashboard\page.tsx:8:37)
+  199 | ...
+  200 | ...
+> 201 | ...").orderBy("createdAt", "desc").limit(200).get();
+      |                                               ^
+  202 | ...nse>(doc));
+  203 | ...
+  204 | ... {
+  code: 8,
+  details: 'Quota exceeded.',
+  metadata: Metadata {
+    internalRepr: Map(1) { 'x-debug-tracking-id' => [Array] },
+    opaqueData: Map(0) {},
+    options: {}
+  },
+  digest: '3844721009'
+}
+Compaction failed: Failed to compact database
+
+Caused by:
+    0: Failed to merge database files for family 1
+    1: Failed to write key block
+    2: Failed to write block data
+    3: There is not enough space on the disk. (os error 112)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+
+-----
+[1m[31mFATAL[39m[0m: An unexpected Turbopack error occurred. A panic log has been written to C:\Users\MF\AppData\Local\Temp\next-panic-667e69363d24b21e84caeee7f1cc7624.log.
+
+To help make Turbopack better, report this error by clicking here: https://bugs.nextjs.org/search?category=turbopack-error-report&title=Turbopack%20Error%3A%20failed%20to%20write%20to%20%22C%3A%5C%5CUsers%5C%5CMF%5C%5CDesktop%5C%5Cmore%5C%5C.next%5C%5Cdev%5C%5Cserver%5C%5Cchunks%5C%5Cssr%5C%5C%5Broot-of-the-server%5D__0eu040c._.js.map%22&body=Turbopack%20version%3A%20%60v16.2.10%60%0ANext.js%20version%3A%20%600.0.0%60%0A%0AError%20message%3A%0A%60%60%60%0Afailed%20to%20write%20to%20%22C%3A%5C%5CUsers%5C%5CMF%5C%5CDesktop%5C%5Cmore%5C%5C.next%5C%5Cdev%5C%5Cserver%5C%5Cchunks%5C%5Cssr%5C%5C%5Broot-of-the-server%5D__0eu040c._.js.map%22%0A%0ACaused%20by%3A%0A-%20There%20is%20not%20enough%20space%20on%20the%20disk.%20%28os%20error%20112%29%0A%60%60%60&labels=Turbopack,Turbopack%20Panic%20Backtrace
+-----
+
+[Server HMR] Subscription error: Error [TurbopackInternalError]: failed to write to "C:\\Users\\MF\\Desktop\\more\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0eu040c._.js.map"
+
+Caused by:
+- There is not enough space on the disk. (os error 112)
+    at <unknown> (TurbopackInternalError: failed to write to "C:\\Users\\MF\\Desktop\\more\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0eu040c._.js.map") {
+  location: undefined
+}
+[Server HMR] Subscription error: Error [TurbopackInternalError]: failed to write to "C:\\Users\\MF\\Desktop\\more\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0eu040c._.js.map"
+
+Caused by:
+- There is not enough space on the disk. (os error 112)
+    at <unknown> (TurbopackInternalError: failed to write to "C:\\Users\\MF\\Desktop\\more\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0eu040c._.js.map") {
+  location: undefined
+}
+[Server HMR] Subscription error: Error [TurbopackInternalError]: failed to write to "C:\\Users\\MF\\Desktop\\more\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0eu040c._.js.map"
+
+Caused by:
+- There is not enough space on the disk. (os error 112)
+    at <unknown> (TurbopackInternalError: failed to write to "C:\\Users\\MF\\Desktop\\more\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0eu040c._.js.map") {
+  location: undefined
+}
+[Server HMR] Subscription error: Error [TurbopackInternalError]: failed to write to "C:\\Users\\MF\\Desktop\\more\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0eu040c._.js.map"
+
+Caused by:
+- There is not enough space on the disk. (os error 112)
+    at <unknown> (TurbopackInternalError: failed to write to "C:\\Users\\MF\\Desktop\\more\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0eu040c._.js.map") {
+  location: undefined
+}
+[Server HMR] Subscription error: Error [TurbopackInternalError]: failed to write to "C:\\Users\\MF\\Desktop\\more\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0eu040c._.js.map"
+
+Caused by:
+- There is not enough space on the disk. (os error 112)
+    at <unknown> (TurbopackInternalError: failed to write to "C:\\Users\\MF\\Desktop\\more\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0eu040c._.js.map") {
+  location: undefined
+}
+[Server HMR] Subscription error: Error [TurbopackInternalError]: failed to write to "C:\\Users\\MF\\Desktop\\more\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0eu040c._.js.map"
+
+Caused by:
+- There is not enough space on the disk. (os error 112)
+    at <unknown> (TurbopackInternalError: failed to write to "C:\\Users\\MF\\Desktop\\more\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0eu040c._.js.map") {
+  location: undefined
+}
+[Server HMR] Subscription error: Error [TurbopackInternalError]: failed to write to "C:\\Users\\MF\\Desktop\\more\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0eu040c._.js.map"
+
+Caused by:
+- There is not enough space on the disk. (os error 112)
+    at <unknown> (TurbopackInternalError: failed to write to "C:\\Users\\MF\\Desktop\\more\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0eu040c._.js.map") {
+  location: undefined
+}
+[Server HMR] Subscription error: Error [TurbopackInternalError]: failed to write to "C:\\Users\\MF\\Desktop\\more\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0eu040c._.js.map"
+
+Caused by:
+- There is not enough space on the disk. (os error 112)
+    at <unknown> (TurbopackInternalError: failed to write to "C:\\Users\\MF\\Desktop\\more\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0eu040c._.js.map") {
+  location: undefined
+}
+[Server HMR] Subscription error: Error [TurbopackInternalError]: failed to write to "C:\\Users\\MF\\Desktop\\more\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0g7s4op._.js"
+
+Caused by:
+- There is not enough space on the disk. (os error 112)
+    at <unknown> (TurbopackInternalError: failed to write to "C:\\Users\\MF\\Desktop\\more\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0g7s4op._.js") {
+  location: undefined
+}
+[Server HMR] Subscription error: Error [TurbopackInternalError]: failed to write to "C:\\Users\\MF\\Desktop\\more\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0g7s4op._.js"
+
+Caused by:
+- There is not enough space on the disk. (os error 112)
+    at <unknown> (TurbopackInternalError: failed to write to "C:\\Users\\MF\\Desktop\\more\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0g7s4op._.js") {
+  location: undefined
+}
+[Server HMR] Subscription error: Error [TurbopackInternalError]: failed to write to "C:\\Users\\MF\\Desktop\\more\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0g7s4op._.js"
+
+Caused by:
+- There is not enough space on the disk. (os error 112)
+    at <unknown> (TurbopackInternalError: failed to write to "C:\\Users\\MF\\Desktop\\more\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0g7s4op._.js") {
+  location: undefined
+}
+[Server HMR] Subscription error: Error [TurbopackInternalError]: failed to write to "C:\\Users\\MF\\Desktop\\more\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0g7s4op._.js"
+
+Caused by:
+- There is not enough space on the disk. (os error 112)
+    at <unknown> (TurbopackInternalError: failed to write to "C:\\Users\\MF\\Desktop\\more\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0g7s4op._.js") {
+  location: undefined
+}
+[Server HMR] Subscription error: Error [TurbopackInternalError]: failed to write to "C:\\Users\\MF\\Desktop\\more\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0g7s4op._.js"
+
+Caused by:
+- There is not enough space on the disk. (os error 112)
+    at <unknown> (TurbopackInternalError: failed to write to "C:\\Users\\MF\\Desktop\\more\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0g7s4op._.js") {
+  location: undefined
+}
+[Server HMR] Subscription error: Error [TurbopackInternalError]: failed to write to "C:\\Users\\MF\\Desktop\\more\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0g7s4op._.js"
+
+Caused by:
+- There is not enough space on the disk. (os error 112)
+    at <unknown> (TurbopackInternalError: failed to write to "C:\\Users\\MF\\Desktop\\more\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0g7s4op._.js") {
+  location: undefined
+}
+[Server HMR] Subscription error: Error [TurbopackInternalError]: failed to write to "C:\\Users\\MF\\Desktop\\more\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0g7s4op._.js"
+
+Caused by:
+- There is not enough space on the disk. (os error 112)
+    at <unknown> (TurbopackInternalError: failed to write to "C:\\Users\\MF\\Desktop\\more\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0g7s4op._.js") {
+  location: undefined
+}
+
+-----
+[1m[31mFATAL[39m[0m: An unexpected Turbopack error occurred. A panic log has been written to C:\Users\MF\AppData\Local\Temp\next-panic-667e69363d24b21e84caeee7f1cc7624.log.
+
+To help make Turbopack better, report this error by clicking here: https://bugs.nextjs.org/search?category=turbopack-error-report&title=Turbopack%20Error%3A%20failed%20to%20write%20to%20%22C%3A%5C%5CUsers%5C%5CMF%5C%5CDesktop%5C%5Cmore%5C%5C.next%5C%5Cdev%5C%5Cserver%5C%5Cchunks%5C%5Cssr%5C%5C%5Broot-of-the-server%5D__0eu040c._.js.map%22&body=Turbopack%20version%3A%20%60v16.2.10%60%0ANext.js%20version%3A%20%600.0.0%60%0A%0AError%20message%3A%0A%60%60%60%0Afailed%20to%20write%20to%20%22C%3A%5C%5CUsers%5C%5CMF%5C%5CDesktop%5C%5Cmore%5C%5C.next%5C%5Cdev%5C%5Cserver%5C%5Cchunks%5C%5Cssr%5C%5C%5Broot-of-the-server%5D__0eu040c._.js.map%22%0A%0ACaused%20by%3A%0A-%20There%20is%20not%20enough%20space%20on%20the%20disk.%20%28os%20error%20112%29%0A%60%60%60&labels=Turbopack,Turbopack%20Panic%20Backtrace
+-----
+
+Failed to flush logs to file: Error: ENOSPC: no space left on device, write
+    at ignore-listed frames {
+  errno: -4055,
+  code: 'ENOSPC',
+  syscall: 'write'
+}
+Failed to flush logs to file: Error: ENOSPC: no space left on device, write
+    at ignore-listed frames {
+  errno: -4055,
+  code: 'ENOSPC',
+  syscall: 'write'
+}
+Failed to flush logs to file: Error: ENOSPC: no space left on device, write
+    at ignore-listed frames {
+  errno: -4055,
+  code: 'ENOSPC',
+  syscall: 'write'
+}
+
+thread 'tokio-runtime-worker' (11180) panicked at crates\next-napi-bindings\src\next_api\turbopack_ctx.rs:379:68:
+called `Result::unwrap()` on an `Err` value: Os { code: 112, kind: StorageFull, message: "There is not enough space on the disk." }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+thread 'tokio-runtime-worker' (6420) panicked at crates\next-napi-bindings\src\next_api\turbopack_ctx.rs:323:51:
+called `Result::unwrap()` on an `Err` value: PoisonError { .. }
+Failed to flush logs to file: Error: ENOSPC: no space left on device, write
+    at ignore-listed frames {
+  errno: -4055,
+  code: 'ENOSPC',
+  syscall: 'write'
+}
+⨯ [Error: Panic in async function] { code: 'GenericFailure' }
+⨯ [Error: Panic in async function] { code: 'GenericFailure' }
+
+thread 'tokio-runtime-worker' (11180) panicked at crates\next-napi-bindings\src\next_api\turbopack_ctx.rs:323:51:
+called `Result::unwrap()` on an `Err` value: PoisonError { .. }
+
+thread 'tokio-runtime-worker' (11180) panicked at crates\next-napi-bindings\src\next_api\turbopack_ctx.rs:323:51:
+called `Result::unwrap()` on an `Err` value: PoisonError { .. }
+⨯ [Error: Panic in async function] { code: 'GenericFailure' }
+⨯ [Error: Panic in async function] { code: 'GenericFailure' }
+Failed to flush logs to file: Error: ENOSPC: no space left on device, write
+    at ignore-listed frames {
+  errno: -4055,
+  code: 'ENOSPC',
+  syscall: 'write'
+}
+Failed to flush logs to file: Error: ENOSPC: no space left on device, write
+    at ignore-listed frames {
+  errno: -4055,
+  code: 'ENOSPC',
+  syscall: 'write'
+}
+Failed to flush logs to file: Error: ENOSPC: no space left on device, write
+    at ignore-listed frames {
+  errno: -4055,
+  code: 'ENOSPC',
+  syscall: 'write'
+}
+Failed to flush logs to file: Error: ENOSPC: no space left on device, write
+    at ignore-listed frames {
+  errno: -4055,
+  code: 'ENOSPC',
+  syscall: 'write'
+}
+Failed to flush logs to file: Error: ENOSPC: no space left on device, write
+    at ignore-listed frames {
+  errno: -4055,
+  code: 'ENOSPC',
+  syscall: 'write'
+}
+Failed to flush logs to file: Error: ENOSPC: no space left on device, write
+    at ignore-listed frames {
+  errno: -4055,
+  code: 'ENOSPC',
+  syscall: 'write'
+}
+Failed to flush logs to file: Error: ENOSPC: no space left on device, write
+    at ignore-listed frames {
+  errno: -4055,
+  code: 'ENOSPC',
+  syscall: 'write'
+}
+Failed to flush logs to file: Error: ENOSPC: no space left on device, write
+    at ignore-listed frames {
+  errno: -4055,
+  code: 'ENOSPC',
+  syscall: 'write'
+}
+Failed to flush logs to file: Error: ENOSPC: no space left on device, write
+    at ignore-listed frames {
+  errno: -4055,
+  code: 'ENOSPC',
+  syscall: 'write'
+}
+Failed to flush logs to file: Error: ENOSPC: no space left on device, write
+    at ignore-listed frames {
+  errno: -4055,
+  code: 'ENOSPC',
+  syscall: 'write'
+}
+Failed to flush logs to file: Error: ENOSPC: no space left on device, write
+    at ignore-listed frames {
+  errno: -4055,
+  code: 'ENOSPC',
+  syscall: 'write'
+}
+Failed to flush logs to file: Error: ENOSPC: no space left on device, write
+    at ignore-listed frames {
+  errno: -4055,
+  code: 'ENOSPC',
+  syscall: 'write'
+}
+Failed to flush logs to file: Error: ENOSPC: no space left on device, write
+    at ignore-listed frames {
+  errno: -4055,
+  code: 'ENOSPC',
+  syscall: 'write'
+}
+Failed to flush logs to file: Error: ENOSPC: no space left on device, write
+    at ignore-listed frames {
+  errno: -4055,
+  code: 'ENOSPC',
+  syscall: 'write'
+}
+Failed to flush logs to file: Error: ENOSPC: no space left on device, write
+    at ignore-listed frames {
+  errno: -4055,
+  code: 'ENOSPC',
+  syscall: 'write'
+}
+Failed to flush logs to file: Error: ENOSPC: no space left on device, write
+    at ignore-listed frames {
+  errno: -4055,
+  code: 'ENOSPC',
+  syscall: 'write'
+}
+Failed to flush logs to file: Error: ENOSPC: no space left on device, write
+    at ignore-listed frames {
+  errno: -4055,
+  code: 'ENOSPC',
+  syscall: 'write'
+}
+Failed to flush logs to file: Error: ENOSPC: no space left on device, write
+    at ignore-listed frames {
+  errno: -4055,
+  code: 'ENOSPC',
+  syscall: 'write'
+}
+Failed to flush logs to file: Error: ENOSPC: no space left on device, write
+    at ignore-listed frames {
+  errno: -4055,
+  code: 'ENOSPC',
+  syscall: 'write'
+}
+Failed to flush logs to file: Error: ENOSPC: no space left on device, write
+    at ignore-listed frames {
+  errno: -4055,
+  code: 'ENOSPC',
+  syscall: 'write'
+}
+Failed to flush logs to file: Error: ENOSPC: no space left on device, write
+    at ignore-listed frames {
+  errno: -4055,
+  code: 'ENOSPC',
+  syscall: 'write'
+}
+Failed to flush logs to file: Error: ENOSPC: no space left on device, write
+    at ignore-listed frames {
+  errno: -4055,
+  code: 'ENOSPC',
+  syscall: 'write'
+}
+[Error: ENOSPC: no space left on device, write] {
+  errno: -4055,
+  code: 'ENOSPC',
+  syscall: 'write'
+}
+⨯ uncaughtException: [Error: ENOSPC: no space left on device, write] {
+  errno: -4055,
+  code: 'ENOSPC',
+  syscall: 'write'
+}
+⨯ uncaughtException:  [Error: ENOSPC: no space left on device, write] {
+  errno: -4055,
+  code: 'ENOSPC',
+  syscall: 'write'
+}
+Failed to flush logs to file: Error: ENOSPC: no space left on device, write
+    at ignore-listed frames {
+  errno: -4055,
+  code: 'ENOSPC',
+  syscall: 'write'
+}
+Failed to flush logs to file: Error: ENOSPC: no space left on device, write
+    at ignore-listed frames {
+  errno: -4055,
+  code: 'ENOSPC',
+  syscall: 'write'
+}
+Failed to flush logs to file: Error: ENOSPC: no space left on device, write
+    at ignore-listed frames {
+  errno: -4055,
+  code: 'ENOSPC',
+  syscall: 'write'
+}
+Failed to flush logs to file: Error: ENOSPC: no space left on device, write
+    at ignore-listed frames {
+  errno: -4055,
+  code: 'ENOSPC',
+  syscall: 'write'
+}
+Failed to flush logs to file: Error: ENOSPC: no space left on device, write
+    at ignore-listed frames {
+  errno: -4055,
+  code: 'ENOSPC',
+  syscall: 'write'
+}
+Failed to flush logs to file: Error: ENOSPC: no space left on device, write
+    at ignore-listed frames {
+  errno: -4055,
+  code: 'ENOSPC',
+  syscall: 'write'
+}
+Failed to flush logs to file: Error: ENOSPC: no space left on device, write
+    at ignore-listed frames {
+  errno: -4055,
+  code: 'ENOSPC',
+  syscall: 'write'
+}
+Failed to flush logs to file: Error: ENOSPC: no space left on device, write
+    at ignore-listed frames {
+  errno: -4055,
+  code: 'ENOSPC',
+  syscall: 'write'
+}
+Failed to flush logs to file: Error: ENOSPC: no space left on device, write
+    at ignore-listed frames {
+  errno: -4055,
+  code: 'ENOSPC',
+  syscall: 'write'
+}
+Failed to flush logs to file: Error: ENOSPC: no space left on device, write
+    at ignore-listed frames {
+  errno: -4055,
+  code: 'ENOSPC',
+  syscall: 'write'
+}
+Failed to flush logs to file: Error: ENOSPC: no space left on device, write
+    at ignore-listed frames {
+  errno: -4055,
+  code: 'ENOSPC',
+  syscall: 'write'
+}
+Failed to flush logs to file: Error: ENOSPC: no space left on device, write
+    at ignore-listed frames {
+  errno: -4055,
+  code: 'ENOSPC',
+  syscall: 'write'
+}
+Failed to flush logs to file: Error: ENOSPC: no space left on device, write
+    at ignore-listed frames {
+  errno: -4055,
+  code: 'ENOSPC',
+  syscall: 'write'
+}
+[browser] Uncaught Error: Panic in async function
+Error: Panic in async function
+
+[browser] Uncaught Error: Panic in async function
+Error: Panic in async function
+
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+
+thread 'tokio-runtime-worker' (33028) panicked at crates\next-napi-bindings\src\next_api\turbopack_ctx.rs:323:51:
+called `Result::unwrap()` on an `Err` value: PoisonError { .. }
+⨯ [Error: Panic in async function] { code: 'GenericFailure' }
+[browser] Uncaught Error: Panic in async function
+Error: Panic in async function
+
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+
+thread 'tokio-runtime-worker' (29384) panicked at crates\next-napi-bindings\src\next_api\turbopack_ctx.rs:323:51:
+called `Result::unwrap()` on an `Err` value: PoisonError { .. }
+⨯ [Error: Panic in async function] { code: 'GenericFailure' }
+[browser] Uncaught Error: Panic in async function
+Error: Panic in async function
+
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+
+thread 'tokio-runtime-worker' (7872) panicked at crates\next-napi-bindings\src\next_api\turbopack_ctx.rs:323:51:
+called `Result::unwrap()` on an `Err` value: PoisonError { .. }
+⨯ [Error: Panic in async function] { code: 'GenericFailure' }
+[browser] Uncaught Error: Panic in async function
+Error: Panic in async function
+
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)

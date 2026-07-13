@@ -22,15 +22,17 @@ export const getCurrentUser = cache(async (): Promise<UserProfile | null> => {
   const cookieStore = await cookies();
   const headerStore = await headers();
   const bearer = headerStore.get("authorization")?.replace(/^Bearer\s+/i, "");
-  const idToken = bearer || cookieStore.get("__session")?.value;
-  if (!idToken) return null;
+  const sessionCookie = cookieStore.get("__session")?.value;
+  if (!bearer && !sessionCookie) return null;
 
   const auth = getAdminAuth();
   const db = getAdminDb();
   if (!auth || !db) return null;
 
   try {
-    const decoded = await auth.verifyIdToken(idToken);
+    const decoded = bearer
+      ? await auth.verifyIdToken(bearer)
+      : await auth.verifySessionCookie(sessionCookie as string, true);
     const snap = await db.collection("users").doc(decoded.uid).get();
     if (!snap.exists) return null;
     return snap.data() as UserProfile;

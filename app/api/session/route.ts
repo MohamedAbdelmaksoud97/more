@@ -4,6 +4,29 @@ import { z } from "zod";
 import { getAdminAuth, getAdminDb, hasFirebaseAdminConfig } from "@/lib/firebase/admin";
 
 const schema = z.object({ idToken: z.string().min(20) });
+const SESSION_MAX_AGE = 60 * 60 * 24 * 5;
+
+function authErrorCode(error: unknown) {
+  return typeof error === "object" && error && "code" in error ? String(error.code) : "unknown";
+}
+
+function sessionErrorResponse(error: unknown) {
+  const code = authErrorCode(error);
+  if (code === "8" || code === "resource-exhausted") {
+    return NextResponse.json(
+      {
+        error: "تم تجاوز حصة Firestore الحالية. انتظر إعادة ضبط الحصة أو فعّل/راجع خطة Firebase Billing.",
+        code,
+      },
+      { status: 503 },
+    );
+  }
+
+  return NextResponse.json(
+    { error: "تعذر التحقق من الجلسة", code },
+    { status: code.startsWith("auth/") ? 401 : 500 },
+  );
+}
 
 export async function POST(request: Request) {
   if (!hasFirebaseAdminConfig()) return NextResponse.json({ ok: true, demo: true });
@@ -43,16 +66,21 @@ export async function POST(request: Request) {
     }
 
     const cookieStore = await cookies();
-    cookieStore.set("__session", parsed.data.idToken, {
+    const sessionCookie = await auth.createSessionCookie(parsed.data.idToken, {
+      expiresIn: SESSION_MAX_AGE * 1000,
+    });
+
+    cookieStore.set("__session", sessionCookie, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",
-      maxAge: 60 * 60,
+      maxAge: SESSION_MAX_AGE,
     });
     return NextResponse.json({ ok: true, status, role });
-  } catch {
-    return NextResponse.json({ error: "تعذر التحقق من الجلسة" }, { status: 401 });
+  } catch (error) {
+    console.error("Session verification failed", { code: authErrorCode(error) });
+    return sessionErrorResponse(error);
   }
 }
 

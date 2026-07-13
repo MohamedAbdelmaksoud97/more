@@ -79,6 +79,7 @@ export const coordinatorNav: NavSection[] = [
       { href: "/coordinator/orders/pending", label: "مراجعة الطلبات" },
       { href: "/coordinator/orders/shipping", label: "الشحن" },
       { href: "/coordinator/orders/returns", label: "المرتجعات" },
+      { href: "/coordinator/expenses", label: "المصروفات" },
     ],
   },
   {
