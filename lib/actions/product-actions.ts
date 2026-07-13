@@ -246,17 +246,20 @@ export async function requestProductImagesAction(_state: ActionState, formData: 
 
   await Promise.all(
     recipients.map((recipientRole) =>
-      createNotification({
-        title: "طلب صور إضافية",
-        body: `${user.name} طلب صور إضافية لمنتج ${product.name}: ${parsed.data.notes}`,
-        type: "PRODUCT_IMAGES_REQUESTED",
-        recipientRole,
-        actorUserId: user.uid,
-        actorName: user.name,
-        relatedEntityType: "product",
-        relatedEntityId: parsed.data.productId,
-        requiresAction: true,
-      }),
+      createNotification(
+        {
+          title: "طلب صور إضافية",
+          body: `${user.name} طلب صور إضافية لمنتج ${product.name}: ${parsed.data.notes}`,
+          type: "PRODUCT_IMAGES_REQUESTED",
+          recipientRole,
+          actorUserId: user.uid,
+          actorName: user.name,
+          relatedEntityType: "product",
+          relatedEntityId: parsed.data.productId,
+          requiresAction: true,
+        },
+        { mirrorToAdmin: false },
+      ),
     ),
   );
 

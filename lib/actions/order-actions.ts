@@ -170,17 +170,20 @@ export async function createOrderAction(_state: OrderActionState, formData: Form
     });
     await Promise.all(
       (["coordinator", "admin"] as const).map((recipientRole) =>
-        createNotification({
-          title: "طلب جديد للمراجعة",
-          body: `${user.name} أنشأ طلب ${order.orderNumber} - ${product.name}`,
-          type: "ORDER_CREATED",
-          recipientRole,
-          actorUserId: user.uid,
-          actorName: user.name,
-          relatedEntityType: "order",
-          relatedEntityId: ref.id,
-          requiresAction: recipientRole === "coordinator",
-        }),
+        createNotification(
+          {
+            title: "طلب جديد للمراجعة",
+            body: `${user.name} أنشأ طلب ${order.orderNumber} - ${product.name}`,
+            type: "ORDER_CREATED",
+            recipientRole,
+            actorUserId: user.uid,
+            actorName: user.name,
+            relatedEntityType: "order",
+            relatedEntityId: ref.id,
+            requiresAction: recipientRole === "coordinator",
+          },
+          { mirrorToAdmin: false },
+        ),
       ),
     );
     revalidatePath("/marketer/orders");
@@ -498,17 +501,20 @@ export async function confirmDeliveryPaymentAction(_state: OrderActionState, for
       requiresAction: false,
     });
     if (user.uid !== updatedOrder.marketerId) {
-      await createNotification({
-        title: "تم تأكيد تحصيل الطلب",
-        body: `تم تأكيد تحصيل طلب ${updatedOrder.productName}`,
-        type: "ORDER_PAYMENT_CONFIRMED",
-        recipientUserId: updatedOrder.marketerId,
-        actorUserId: user.uid,
-        actorName: user.name,
-        relatedEntityType: "order",
-        relatedEntityId: updatedOrder.id,
-        requiresAction: false,
-      });
+      await createNotification(
+        {
+          title: "تم تأكيد تحصيل الطلب",
+          body: `تم تأكيد تحصيل طلب ${updatedOrder.productName}`,
+          type: "ORDER_PAYMENT_CONFIRMED",
+          recipientUserId: updatedOrder.marketerId,
+          actorUserId: user.uid,
+          actorName: user.name,
+          relatedEntityType: "order",
+          relatedEntityId: updatedOrder.id,
+          requiresAction: false,
+        },
+        { mirrorToAdmin: false },
+      );
     }
     await createNotification({
       title: "عمولة معلقة جديدة",
@@ -798,17 +804,20 @@ export async function payCommissionAction(formData: FormData) {
     before: { commissionStatus: order.commissionStatus, commissionAmount: order.commissionAmount },
     after: { commissionStatus: "PAID", commissionAmount: order.commissionAmount, paidAt: now },
   });
-  await createNotification({
-    title: "تم صرف العمولة",
-    body: `تم صرف عمولة طلب ${order.productName} بقيمة ${order.commissionAmount} ج.م`,
-    type: "COMMISSION_PAID",
-    recipientUserId: order.marketerId,
-    actorUserId: user.uid,
-    actorName: user.name,
-    relatedEntityType: "commission",
-    relatedEntityId: orderId,
-    requiresAction: false,
-  });
+  await createNotification(
+    {
+      title: "تم صرف العمولة",
+      body: `تم صرف عمولة طلب ${order.productName} بقيمة ${order.commissionAmount} ج.م`,
+      type: "COMMISSION_PAID",
+      recipientUserId: order.marketerId,
+      actorUserId: user.uid,
+      actorName: user.name,
+      relatedEntityType: "commission",
+      relatedEntityId: orderId,
+      requiresAction: false,
+    },
+    { mirrorToAdmin: false },
+  );
   await createNotification({
     title: "تم صرف عمولة",
     body: `تم صرف عمولة ${order.marketerName} لطلب ${order.productName}`,

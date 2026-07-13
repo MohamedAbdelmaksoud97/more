@@ -251,15 +251,21 @@ export async function writeAudit(entry: Omit<AuditLog, "id" | "createdAt">) {
   await db.collection("audit_logs").add({ ...entry, createdAt: FieldValue.serverTimestamp() });
 }
 
+type CreateNotificationOptions = {
+  mirrorToAdmin?: boolean;
+};
+
 export async function createNotification(
   notification: Omit<NotificationItem, "id" | "createdAt" | "isRead">,
+  options: CreateNotificationOptions = {},
 ) {
   const db = dbOrNull();
   if (!db) return;
 
   await saveAndPushNotification(db, notification);
 
-  if (notification.recipientRole !== "admin") {
+  const mirrorToAdmin = options.mirrorToAdmin ?? true;
+  if (mirrorToAdmin && notification.recipientRole !== "admin") {
     await saveAndPushNotification(db, {
       ...notification,
       recipientUserId: undefined,

@@ -333,17 +333,20 @@ export async function resetMarketerCommissionsAction(_state: ActionState, formDa
     after: { marketerId: parsed.data.marketerId, affectedOrders: resettable.length },
   });
 
-  await createNotification({
-    title: "تم تصفير العمولات",
-    body: `تم تصفير ${resettable.length} عمولة غير مدفوعة في حسابك.`,
-    type: "COMMISSION_DEDUCTED",
-    recipientUserId: parsed.data.marketerId,
-    actorUserId: actor.uid,
-    actorName: actor.name,
-    relatedEntityType: "commission",
-    relatedEntityId: parsed.data.marketerId,
-    requiresAction: false,
-  });
+  await createNotification(
+    {
+      title: "تم تصفير العمولات",
+      body: `تم تصفير ${resettable.length} عمولة غير مدفوعة في حسابك.`,
+      type: "COMMISSION_DEDUCTED",
+      recipientUserId: parsed.data.marketerId,
+      actorUserId: actor.uid,
+      actorName: actor.name,
+      relatedEntityType: "commission",
+      relatedEntityId: parsed.data.marketerId,
+      requiresAction: false,
+    },
+    { mirrorToAdmin: false },
+  );
 
   revalidatePath("/admin/commissions");
   revalidatePath("/admin/dashboard");
