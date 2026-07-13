@@ -1,5 +1,6 @@
 import { PageHeader } from "@/components/erp/app-shell";
-import { CommissionSettingsForm, MonthlyCommissionResetForm } from "@/components/forms/commission-admin-forms";
+import { CommissionSettingsForm, MarketerCommissionResetForm, MonthlyCommissionResetForm } from "@/components/forms/commission-admin-forms";
+import { CommissionOrderActionCell } from "@/components/forms/commission-order-actions";
 import { Panel } from "@/components/ui/cards";
 import { DataTable } from "@/components/ui/table";
 import { commissionStatusLabels } from "@/lib/constants";
@@ -24,6 +25,10 @@ export default async function AdminCommissionsPage() {
         <MonthlyCommissionResetForm />
       </Panel>
 
+      <Panel title="تصفير عمولة مسوق" description="يصفر العمولات غير المدفوعة لمسوق محدد فقط دون التأثير على باقي المسوقين.">
+        <MarketerCommissionResetForm marketers={marketers} />
+      </Panel>
+
       <Panel title="إعدادات المسوقين الحالية">
         <DataTable headers={["المسوق", "نوع العمولة", "القيمة"]}>
           {marketers.map((marketer) => (
@@ -41,13 +46,16 @@ export default async function AdminCommissionsPage() {
       </Panel>
 
       <Panel title="سجل عمولات الطلبات">
-        <DataTable headers={["الطلب", "المسوق", "الحالة", "القيمة"]}>
+        <DataTable headers={["الطلب", "المسوق", "الحالة", "القيمة", "الإجراء"]}>
           {orders.map((order) => (
             <tr key={order.id}>
               <td className="px-4 py-3 font-bold">{formatOrderNumber(order)}</td>
               <td className="px-4 py-3">{order.marketerName}</td>
               <td className="px-4 py-3">{commissionStatusLabels[order.commissionStatus]}</td>
               <td className="px-4 py-3">{formatCurrency(order.commissionAmount)}</td>
+              <td className="px-4 py-3">
+                <CommissionOrderActionCell orderId={order.id} status={order.commissionStatus} />
+              </td>
             </tr>
           ))}
         </DataTable>

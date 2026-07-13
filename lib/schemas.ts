@@ -120,6 +120,10 @@ export const resetCommissionsSchema = z.object({
   year: z.coerce.number().int().min(2024).max(2100),
 });
 
+export const resetMarketerCommissionsSchema = z.object({
+  marketerId: z.string().min(1, "اختر المسوق"),
+});
+
 export const resetTargetSchema = z.object({
   targetId: z.string().min(1, "الهدف غير صحيح"),
 });

@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import {
+  resetMarketerCommissionsAction,
   resetMonthlyCommissionsAction,
   resetTargetAction,
   updateMarketerCommissionAction,
@@ -74,6 +75,33 @@ export function MonthlyCommissionResetForm() {
         <Button type="submit" variant="danger" loading={pending}>تصفير عمولات الشهر</Button>
       </div>
       <div className="md:col-span-3">
+        <StateMessage state={state} />
+      </div>
+    </form>
+  );
+}
+
+export function MarketerCommissionResetForm({ marketers }: { marketers: UserProfile[] }) {
+  const [state, action, pending] = useActionState(resetMarketerCommissionsAction, initialState);
+
+  return (
+    <form action={action} className="grid gap-4 md:grid-cols-[minmax(0,1fr)_auto]">
+      <Field label="المسوق" error={state.errors?.marketerId}>
+        <Select name="marketerId" required>
+          <option value="">اختر المسوق</option>
+          {marketers.map((marketer) => (
+            <option key={marketer.uid} value={marketer.uid}>
+              {marketer.name}
+            </option>
+          ))}
+        </Select>
+      </Field>
+      <div className="grid content-end gap-3">
+        <Button type="submit" variant="danger" loading={pending}>
+          تصفير عمولة المسوق
+        </Button>
+      </div>
+      <div className="md:col-span-2">
         <StateMessage state={state} />
       </div>
     </form>

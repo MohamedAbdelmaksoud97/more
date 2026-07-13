@@ -15,7 +15,7 @@ export default async function AdminExpensesPage() {
       <div className="grid gap-6">
         <Panel
           title="إضافة مصروف"
-          description="أي تكلفة تشغيلية يتم تسجيلها هنا تخصم من صافي النقدية والتقارير."
+          description="أي تكلفة تشغيلية يتم تسجيلها هنا تخصم من صافي النقدية، مع خصم العمولات المدفوعة فقط."
         >
           <ExpenseForm />
         </Panel>

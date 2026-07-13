@@ -7,6 +7,7 @@ import {
   commissionSettingsSchema,
   expenseSchema,
   resetCommissionsSchema,
+  resetMarketerCommissionsSchema,
   resetTargetSchema,
   roleSchema,
   targetSchema,
@@ -285,6 +286,70 @@ export async function resetMonthlyCommissionsAction(_state: ActionState, formDat
   revalidatePath("/admin/dashboard");
   revalidatePath("/marketer/commissions");
   return { ok: true, message: `تم تصفير ${resettable.length} عمولة لهذا الشهر` };
+}
+
+export async function resetMarketerCommissionsAction(_state: ActionState, formData: FormData): Promise<ActionState> {
+  const actor = await requireRole(["admin"]);
+  const parsed = resetMarketerCommissionsSchema.safeParse(Object.fromEntries(formData.entries()));
+  if (!parsed.success) return { ok: false, message: "اختر مسوقا صحيحا", errors: parsed.error.flatten().fieldErrors };
+  if (!hasFirebaseAdminConfig()) return { ok: true, message: "تم تصفير عمولات المسوق في وضع العرض التجريبي" };
+
+  const db = getAdminDb();
+  if (!db) return { ok: false, message: "Firebase Admin غير مهيأ" };
+
+  const marketerSnap = await db.collection("users").doc(parsed.data.marketerId).get();
+  if (!marketerSnap.exists || marketerSnap.data()?.role !== "marketer") {
+    return { ok: false, message: "المسوق غير موجود" };
+  }
+
+  const snap = await db.collection("orders").where("marketerId", "==", parsed.data.marketerId).limit(500).get();
+  const resettable = snap.docs
+    .map((doc) => ({ ref: doc.ref, order: { id: doc.id, ...doc.data() } as Order }))
+    .filter(({ order }) => ["EXPECTED", "PENDING", "APPROVED"].includes(order.commissionStatus));
+
+  if (!resettable.length) return { ok: true, message: "لا توجد عمولات قابلة للتصفير لهذا المسوق" };
+
+  const now = new Date().toISOString();
+  const batch = db.batch();
+  resettable.forEach(({ ref, order }) => {
+    batch.update(ref, {
+      commissionStatus: "EXPECTED",
+      commissionAmount: 0,
+      updatedAt: now,
+      timeline: [
+        ...(order.timeline ?? []),
+        { label: "تم تصفير عمولة المسوق", actorName: actor.name, at: now, details: marketerSnap.data()?.name ?? parsed.data.marketerId },
+      ],
+    });
+  });
+  await batch.commit();
+
+  await writeAudit({
+    actorUserId: actor.uid,
+    actorRole: actor.role,
+    action: "commission.marketer_reset",
+    entityType: "commission",
+    entityId: parsed.data.marketerId,
+    after: { marketerId: parsed.data.marketerId, affectedOrders: resettable.length },
+  });
+
+  await createNotification({
+    title: "تم تصفير العمولات",
+    body: `تم تصفير ${resettable.length} عمولة غير مدفوعة في حسابك.`,
+    type: "COMMISSION_DEDUCTED",
+    recipientUserId: parsed.data.marketerId,
+    actorUserId: actor.uid,
+    actorName: actor.name,
+    relatedEntityType: "commission",
+    relatedEntityId: parsed.data.marketerId,
+    requiresAction: false,
+  });
+
+  revalidatePath("/admin/commissions");
+  revalidatePath("/admin/dashboard");
+  revalidatePath("/marketer/commissions");
+  revalidatePath("/marketer/dashboard");
+  return { ok: true, message: `تم تصفير ${resettable.length} عمولة لهذا المسوق` };
 }
 
 export async function resetTargetAction(_state: ActionState, formData: FormData): Promise<ActionState> {

@@ -235,7 +235,7 @@ export async function getDashboardStats(viewer: UserProfile): Promise<DashboardS
   return {
     totalSales,
     grossProfit: totalSales - paidCommissions - expenseTotal,
-    netCash: collectedCash - expenseTotal,
+    netCash: collectedCash - expenseTotal - paidCommissions,
     pendingCommissions,
     approvedCommissions,
     paidCommissions,

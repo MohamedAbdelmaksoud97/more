@@ -21,11 +21,10 @@ export type OrderActionState = {
 };
 
 function commissionCanBeApproved(order: Order) {
+  const approvableStatuses: OrderStatus[] = ["PAYMENT_CONFIRMED", "COMMISSION_PENDING", "COMPLETED"];
   return (
-    order.status === "COMPLETED" &&
+    approvableStatuses.includes(order.status) &&
     order.isPaymentCollected &&
-    Boolean(order.deliveryReceiptByCoordinatorUrl) &&
-    Boolean(order.deliveryReceiptByMarketerUrl) &&
     !["FAILED_DELIVERY", "RETURNED_PENDING_STOCK", "RETURNED_TO_STOCK"].includes(order.status)
   );
 }
@@ -669,20 +668,49 @@ export async function approveCommissionAction(formData: FormData) {
   if (!orderId) return { ok: false, message: "الطلب غير صحيح" };
   const order = await getOrder(user, orderId);
   if (!order) return { ok: false, message: "الطلب غير موجود" };
+  if (order.commissionStatus !== "PENDING") {
+    return { ok: false, message: "يمكن اعتماد العمولة المعلقة فقط" };
+  }
+  if (order.commissionAmount <= 0) {
+    return { ok: false, message: "لا توجد قيمة عمولة قابلة للاعتماد" };
+  }
   if (!commissionCanBeApproved(order)) {
     return { ok: false, message: "لا يمكن اعتماد العمولة قبل اكتمال التسليم والتحصيل والإيصالات" };
   }
   if (!hasFirebaseAdminConfig()) return { ok: true, message: "تم اعتماد العمولة في وضع العرض التجريبي" };
   const db = getAdminDb();
   if (!db) return { ok: false, message: "Firebase Admin غير مهيأ" };
-  await db.collection("orders").doc(orderId).update({ commissionStatus: "APPROVED", updatedAt: new Date().toISOString() });
+  const now = new Date().toISOString();
+  await db.collection("orders").doc(orderId).update({
+    status: "COMPLETED",
+    commissionStatus: "APPROVED",
+    updatedAt: now,
+    timeline: [
+      ...(order.timeline ?? []),
+      {
+        label: "تم اعتماد العمولة وإكمال الطلب",
+        actorName: user.name,
+        at: now,
+        details: `قيمة العمولة: ${order.commissionAmount}`,
+      },
+    ],
+  });
   await db.collection("commissions").add({
     orderId,
     marketerId: order.marketerId,
     status: "APPROVED",
     amount: order.commissionAmount,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+    createdAt: now,
+    updatedAt: now,
+  });
+  await writeAudit({
+    actorUserId: user.uid,
+    actorRole: user.role,
+    action: "commission.approved",
+    entityType: "commission",
+    entityId: orderId,
+    before: { status: order.status, commissionStatus: order.commissionStatus, commissionAmount: order.commissionAmount },
+    after: { status: "COMPLETED", commissionStatus: "APPROVED", commissionAmount: order.commissionAmount },
   });
   await createNotification({
     title: "تم اعتماد عمولة",
@@ -695,5 +723,109 @@ export async function approveCommissionAction(formData: FormData) {
     relatedEntityId: orderId,
     requiresAction: false,
   });
+  revalidatePath("/admin/commissions");
+  revalidatePath("/marketer/commissions");
+  revalidatePath("/admin/dashboard");
+  revalidatePath("/marketer/dashboard");
+  revalidatePath("/admin/orders");
+  revalidatePath("/marketer/orders");
+  revalidatePath(`/admin/orders/${orderId}`);
+  revalidatePath(`/marketer/orders/${orderId}`);
   return { ok: true, message: "تم اعتماد العمولة" };
+}
+
+export async function payCommissionAction(formData: FormData) {
+  const user = await requireRole(["admin"]);
+  const orderId = String(formData.get("orderId") ?? "");
+  if (!orderId) return { ok: false, message: "الطلب غير صحيح" };
+  const order = await getOrder(user, orderId);
+  if (!order) return { ok: false, message: "الطلب غير موجود" };
+  if (order.commissionStatus !== "APPROVED") {
+    return { ok: false, message: "يجب اعتماد العمولة قبل صرفها" };
+  }
+  if (order.commissionAmount <= 0) {
+    return { ok: false, message: "لا توجد قيمة عمولة قابلة للصرف" };
+  }
+  if (!hasFirebaseAdminConfig()) return { ok: true, message: "تم صرف العمولة في وضع العرض التجريبي" };
+  const db = getAdminDb();
+  if (!db) return { ok: false, message: "Firebase Admin غير مهيأ" };
+
+  const now = new Date().toISOString();
+  const commissionSnap = await db.collection("commissions").where("orderId", "==", orderId).limit(1).get();
+  const batch = db.batch();
+  const orderRef = db.collection("orders").doc(orderId);
+  batch.update(orderRef, {
+    commissionStatus: "PAID",
+    updatedAt: now,
+    timeline: [
+      ...(order.timeline ?? []),
+      {
+        label: "تم صرف العمولة",
+        actorName: user.name,
+        at: now,
+        details: `قيمة العمولة: ${order.commissionAmount}`,
+      },
+    ],
+  });
+
+  if (commissionSnap.empty) {
+    const commissionRef = db.collection("commissions").doc();
+    batch.set(commissionRef, {
+      orderId,
+      marketerId: order.marketerId,
+      status: "PAID",
+      amount: order.commissionAmount,
+      createdAt: now,
+      updatedAt: now,
+      paidAt: now,
+    });
+  } else {
+    batch.update(commissionSnap.docs[0].ref, {
+      status: "PAID",
+      amount: order.commissionAmount,
+      updatedAt: now,
+      paidAt: now,
+    });
+  }
+
+  await batch.commit();
+  await writeAudit({
+    actorUserId: user.uid,
+    actorRole: user.role,
+    action: "commission.paid",
+    entityType: "commission",
+    entityId: orderId,
+    before: { commissionStatus: order.commissionStatus, commissionAmount: order.commissionAmount },
+    after: { commissionStatus: "PAID", commissionAmount: order.commissionAmount, paidAt: now },
+  });
+  await createNotification({
+    title: "تم صرف العمولة",
+    body: `تم صرف عمولة طلب ${order.productName} بقيمة ${order.commissionAmount} ج.م`,
+    type: "COMMISSION_PAID",
+    recipientUserId: order.marketerId,
+    actorUserId: user.uid,
+    actorName: user.name,
+    relatedEntityType: "commission",
+    relatedEntityId: orderId,
+    requiresAction: false,
+  });
+  await createNotification({
+    title: "تم صرف عمولة",
+    body: `تم صرف عمولة ${order.marketerName} لطلب ${order.productName}`,
+    type: "COMMISSION_PAID",
+    recipientRole: "admin",
+    actorUserId: user.uid,
+    actorName: user.name,
+    relatedEntityType: "commission",
+    relatedEntityId: orderId,
+    requiresAction: false,
+  });
+
+  revalidatePath("/admin/commissions");
+  revalidatePath("/marketer/commissions");
+  revalidatePath("/admin/dashboard");
+  revalidatePath("/marketer/dashboard");
+  revalidatePath(`/admin/orders/${orderId}`);
+  revalidatePath(`/marketer/orders/${orderId}`);
+  return { ok: true, message: "تم صرف العمولة" };
 }
