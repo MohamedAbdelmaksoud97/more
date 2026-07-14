@@ -5,6 +5,7 @@ import { formatCurrency, formatDateOnly, formatOrderNumber } from "@/lib/utils";
 import { updateUserRoleAction } from "@/lib/actions/admin-actions";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { commissionStatusLabels, locationLabels, orderStatusLabels } from "@/lib/constants";
+import { ReportExportButton, type ExportSheet } from "@/components/erp/report-export-button";
 
 export function ReportsView({
   orders,
@@ -115,6 +116,55 @@ export function ReportsView({
     .sort((a, b) => b.sales - a.sales);
 
   const scrapOrders = monthlyFinancialOrders.filter((order) => order.scrap.hasScrap);
+  const exportSheets: ExportSheet[] = [
+    {
+      name: "الملخص",
+      rows: [
+        { البيان: "إجمالي المبيعات", القيمة: totalSales },
+        { البيان: "النقدية المحصلة", القيمة: collectedCash },
+        { البيان: "صافي النقدية", القيمة: netCash },
+        { البيان: "إجمالي الربح", القيمة: grossProfit },
+        { البيان: "مصروفات", القيمة: expenseTotal },
+        { البيان: "عمولات معلقة", القيمة: pendingCommissions },
+        { البيان: "عمولات معتمدة", القيمة: approvedCommissions },
+        { البيان: "عمولات مدفوعة", القيمة: paidCommissions },
+      ],
+    },
+    {
+      name: "الطلبات",
+      rows: monthlyFinancialOrders.map((order) => ({
+        "رقم الطلب": formatOrderNumber(order),
+        العميل: order.customer.customerName,
+        المنتج: order.productName,
+        المسوق: order.marketerName,
+        الحالة: orderStatusLabels[order.status],
+        القيمة: orderTotal(order),
+        العمولة: order.commissionAmount,
+      })),
+    },
+    {
+      name: "المسوقين",
+      rows: marketerRows.map((row) => ({
+        المسوق: row.marketer.name,
+        الطلبات: row.orders,
+        المبيعات: row.sales,
+        "عمولات معلقة": row.pending,
+        "عمولات معتمدة": row.approved,
+        "عمولات مدفوعة": row.paid,
+        التارجت: row.target?.targetAmount ?? 0,
+        المحقق: row.target?.achievedAmount ?? 0,
+      })),
+    },
+    {
+      name: "المصروفات",
+      rows: monthlyExpenses.map((expense) => ({
+        التصنيف: expense.category,
+        القيمة: expense.amount,
+        الملاحظة: expense.note,
+        التاريخ: formatDateOnly(expense.createdAt),
+      })),
+    },
+  ];
   const whatsappSummary = encodeURIComponent(
     [
       `تقرير MORE Energy - ${monthLabel} ${selectedYear}`,
@@ -136,14 +186,17 @@ export function ReportsView({
         title={`تقرير ${monthLabel} ${selectedYear}`}
         description="يتم تحديث التقرير تلقائيا من الطلبات والمصروفات والعمولات والمخزون الحالي."
         action={
-          <a
-            className="inline-flex h-10 items-center justify-center rounded-md bg-emerald-600 px-4 text-sm font-bold text-white transition hover:bg-emerald-700"
-            href={`https://wa.me/?text=${whatsappSummary}`}
-            target="_blank"
-            rel="noreferrer"
-          >
-            مشاركة واتساب
-          </a>
+          <div className="flex flex-wrap items-center gap-2">
+            <ReportExportButton sheets={exportSheets} filename={`more-energy-report-${selectedYear}-${selectedMonth}`} />
+            <a
+              className="inline-flex h-10 items-center justify-center rounded-md bg-emerald-600 px-4 text-sm font-bold text-white transition hover:bg-emerald-700"
+              href={`https://wa.me/?text=${whatsappSummary}`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              مشاركة واتساب
+            </a>
+          </div>
         }
       >
         <form action="/admin/reports" className="grid gap-3 md:grid-cols-[minmax(0,1fr)_180px_auto]">
@@ -191,6 +244,15 @@ export function ReportsView({
         <MetricCard label="طلبات جديدة" value={monthlyOrders.length} hint="كل الطلبات المنشأة خلال الشهر" />
         <MetricCard label="طلبات محصلة" value={monthlyFinancialOrders.length} hint="دخلت في أرقام المبيعات والنقدية" />
         <MetricCard label="مرتجعات" value={returns} hint="حسب حالة الطلب" tone="gray" />
+      </div>
+
+      <div className="grid gap-6 xl:grid-cols-2">
+        <Panel title="رسم المبيعات حسب المسوق">
+          <BarList rows={marketerRows.map((row) => ({ label: row.marketer.name, value: row.sales }))} />
+        </Panel>
+        <Panel title="رسم المبيعات حسب المنتج">
+          <BarList rows={productRows.slice(0, 8).map((row) => ({ label: row.product.name, value: row.sales }))} />
+        </Panel>
       </div>
 
       <Panel title="أحدث الطلبات المؤثرة في التقرير" description="هذه الطلبات هي التي دخلت في المبيعات والنقدية لهذا الشهر.">
@@ -399,6 +461,32 @@ function MetricCard({
   );
 }
 
+function BarList({ rows }: { rows: Array<{ label: string; value: number }> }) {
+  const max = Math.max(1, ...rows.map((row) => row.value));
+  if (!rows.length) {
+    return <p className="rounded-lg border border-dashed border-slate-200 bg-slate-50 p-6 text-center text-sm font-bold text-slate-500">لا توجد بيانات كافية للرسم في هذا الشهر.</p>;
+  }
+
+  return (
+    <div className="grid gap-3">
+      {rows.map((row) => {
+        const width = Math.max(4, Math.round((row.value / max) * 100));
+        return (
+          <div key={row.label} className="grid gap-2">
+            <div className="flex items-center justify-between gap-3 text-sm font-bold">
+              <span className="truncate text-slate-700">{row.label}</span>
+              <span className="shrink-0 text-slate-950">{formatCurrency(row.value)}</span>
+            </div>
+            <div className="h-3 overflow-hidden rounded-full bg-slate-100">
+              <div className="h-full rounded-full bg-gradient-to-l from-blue-700 to-emerald-500" style={{ width: `${width}%` }} />
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 const statusLabels: Record<string, string> = {
   PENDING_EMAIL_VERIFICATION: "بانتظار تأكيد البريد",
   PENDING_ADMIN_APPROVAL: "بانتظار اعتماد المدير",
@@ -429,12 +517,19 @@ async function updateUserRoleFormAction(formData: FormData) {
 
 export function UsersView({ users, currentUserId }: { users: UserProfile[]; currentUserId?: string }) {
   return (
-    <DataTable headers={["الاسم", "البريد", "الهاتف", "الدور", "الحالة", "الإجراء"]}>
+    <DataTable headers={["الاسم", "البريد", "الهاتف", "العنوان", "البطاقة", "إثبات العنوان", "الدور", "الحالة", "الإجراء"]}>
       {users.map((user) => (
         <tr key={user.uid}>
           <td className="px-4 py-3 font-bold">{user.name}</td>
           <td className="px-4 py-3">{user.email}</td>
           <td className="px-4 py-3">{user.phone}</td>
+          <td className="px-4 py-3">{user.address ?? "غير مسجل"}</td>
+          <td className="px-4 py-3">
+            {user.nationalIdImageUrl ? <a className="font-bold text-blue-700 hover:underline" href={user.nationalIdImageUrl} target="_blank" rel="noreferrer">فتح</a> : "غير مرفوع"}
+          </td>
+          <td className="px-4 py-3">
+            {user.addressProofImageUrl ? <a className="font-bold text-blue-700 hover:underline" href={user.addressProofImageUrl} target="_blank" rel="noreferrer">فتح</a> : "غير مرفوع"}
+          </td>
           <td className="px-4 py-3">{user.role}</td>
           <td className="px-4 py-3">{statusLabels[user.status] ?? user.status}</td>
           <td className="px-4 py-3">

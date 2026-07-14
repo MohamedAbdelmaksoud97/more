@@ -78,8 +78,8 @@ export function WarrantyReturnDetailView({
   role: "admin" | "coordinator" | "marketer";
 }) {
   const canCoordinate = role === "admin" || role === "coordinator";
-  const canMarketerComplete =
-    (role === "marketer" || role === "admin") &&
+  const canCompleteReplacement =
+    (role === "marketer" || role === "admin" || role === "coordinator") &&
     ["RETURN_APPROVED", "REPLACEMENT_PENDING_REVIEW"].includes(item.status) &&
     !item.replacementProductId;
   const canApproveReplacement = canCoordinate && item.status === "REPLACEMENT_PENDING_REVIEW" && Boolean(item.replacementProductId);
@@ -91,7 +91,7 @@ export function WarrantyReturnDetailView({
       <div className="grid gap-6">
         {item.type === "DIRECT_REPLACEMENT" && !item.oldBatteryReceived ? (
           <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm font-black leading-7 text-red-800">
-            تنبيه مهم: هذا استبدال مباشر. البطارية القديمة لم يتم تأكيد استلامها بعد، ويجب استلامها مع تسليم البطارية البديلة.
+            تنبيه مهم: هذا الطلب على مسار الاستبدال المباشر. سيتم إرسال البطارية البديلة للعميل، ويجب على المندوب استلام البطارية القديمة في نفس وقت التسليم. لا يمكن إكمال المرتجع قبل تأكيد استلام البطارية القديمة.
           </div>
         ) : null}
 
@@ -160,7 +160,7 @@ export function WarrantyReturnDetailView({
           </Panel>
         ) : null}
 
-        {canMarketerComplete ? (
+        {canCompleteReplacement ? (
           <Panel title="استكمال بيانات الاستبدال">
             <WarrantyReplacementForm item={item} products={products} />
           </Panel>

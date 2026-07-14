@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import type { Order } from "@/lib/types";
-import { approveOrderAction, rejectOrderAction } from "@/lib/actions/order-actions";
+import { approveOrderAction, rejectOrderAction, requestOrderEditAction } from "@/lib/actions/order-actions";
 import { orderStatusLabels, commissionStatusLabels, locationLabels } from "@/lib/constants";
 import { StatusBadge } from "@/components/ui/badge";
 import { Button, ButtonLink } from "@/components/ui/button";
@@ -57,6 +57,7 @@ export function OrderDetailView({
     canReview && ["APPROVED_RESERVED", "PREPARING_SHIPPING", "SHIPPED"].includes(order.status);
   const showFulfillmentForm =
     canConfirmFulfillment && !order.isPaymentCollected && ["SHIPPED", "DELIVERED_PENDING_CONFIRMATION"].includes(order.status);
+  const showEditRequestForm = !canReview && order.status !== "PENDING_REVIEW";
 
   return (
     <div className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
@@ -82,6 +83,7 @@ export function OrderDetailView({
           <div className="grid gap-4 md:grid-cols-2">
             <Info label="الاسم" value={order.customer.customerName} />
             <Info label="الهاتف" value={order.customer.customerPhone} />
+            <Info label="كل أرقام الهاتف" value={(order.customer.customerPhones?.length ? order.customer.customerPhones : [order.customer.customerPhone]).join(" - ")} />
             <Info label="المحافظة" value={order.customer.governorate} />
             <Info label="المنطقة" value={order.customer.area} />
             <Info label="العنوان" value={order.customer.address} />
@@ -98,6 +100,8 @@ export function OrderDetailView({
             <Info label="يوجد كهنة" value={order.scrap.hasScrap ? "نعم" : "لا"} />
             <Info label="نوع الكهنة" value={order.scrap.scrapType ?? "غير محدد"} />
             <Info label="الأمبير" value={order.scrap.scrapAmpere ?? "غير محدد"} />
+            <Info label="وزن الكهنة" value={order.scrap.scrapWeightKg !== undefined ? `${order.scrap.scrapWeightKg} كجم` : "غير محدد"} />
+            <Info label="سعر الكيلو" value={order.scrap.scrapKiloPrice !== undefined ? formatCurrency(order.scrap.scrapKiloPrice) : "غير محدد"} />
             <Info label="قيمة الكهنة المتوقعة" value={formatCurrency(order.scrap.scrapEstimatedValue ?? 0)} />
             <Info label="ملاحظات الكهنة" value={order.scrap.scrapNotes ?? "لا توجد"} />
           </div>
@@ -105,6 +109,24 @@ export function OrderDetailView({
       </div>
 
       <div className="grid gap-6">
+        {showEditRequestForm ? (
+          <Panel title="طلب تعديل على الأوردر">
+            <form action={requestOrderEditFormAction} className="grid gap-3">
+              <input type="hidden" name="orderId" value={order.id} />
+              <textarea
+                name="notes"
+                required
+                minLength={5}
+                className="min-h-24 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                placeholder="اكتب التعديل المطلوب ليصل للمدير والمنسق"
+              />
+              <Button type="submit" variant="secondary" className="w-full">
+                إرسال طلب تعديل
+              </Button>
+            </form>
+          </Panel>
+        ) : null}
+
         {showFulfillmentForm ? (
           <Panel title="تأكيد التسليم والتحصيل">
             <FulfillmentConfirmationForm orderId={order.id} defaultAmount={order.payment.remainingAmount} />
@@ -190,6 +212,11 @@ function ReviewPanel({ orderId }: { orderId: string }) {
       </div>
     </Panel>
   );
+}
+
+async function requestOrderEditFormAction(formData: FormData) {
+  "use server";
+  await requestOrderEditAction(formData);
 }
 
 function Info({ label, value }: { label: string; value: ReactNode }) {

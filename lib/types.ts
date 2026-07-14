@@ -68,6 +68,7 @@ export type NotificationType =
   | "PRODUCT_IMAGES_REQUESTED"
   | "PRODUCT_IMAGES_ADDED"
   | "ORDER_CREATED"
+  | "ORDER_CREATED_NO_DEPOSIT"
   | "ORDER_APPROVED"
   | "ORDER_REJECTED"
   | "ORDER_SHIPPED"
@@ -102,6 +103,9 @@ export interface UserProfile {
   name: string;
   email: string;
   phone?: string;
+  address?: string;
+  nationalIdImageUrl?: string;
+  addressProofImageUrl?: string;
   role: Role;
   status: UserStatus;
   fcmTokens?: string[];
@@ -165,6 +169,7 @@ export interface ImageRequest {
 export interface CustomerInfo {
   customerName: string;
   customerPhone: string;
+  customerPhones?: string[];
   governorate: string;
   area: string;
   address: string;
@@ -183,6 +188,8 @@ export interface ScrapInfo {
   hasScrap: boolean;
   scrapType?: string;
   scrapAmpere?: number;
+  scrapWeightKg?: number;
+  scrapKiloPrice?: number;
   scrapEstimatedValue?: number;
   scrapImageUrl?: string;
   scrapNotes?: string;

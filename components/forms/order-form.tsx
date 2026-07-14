@@ -20,6 +20,9 @@ export function OrderForm({ products, selectedProductId }: { products: Product[]
   const [discount, setDiscount] = useState(0);
   const [warrantyMonths, setWarrantyMonths] = useState(12);
   const [depositAmount, setDepositAmount] = useState(0);
+  const [scrapWeightKg, setScrapWeightKg] = useState(0);
+  const [scrapKiloPrice, setScrapKiloPrice] = useState(0);
+  const [scrapEstimatedValue, setScrapEstimatedValue] = useState(0);
   const [depositImageUrl, setDepositImageUrl] = useState("");
   const [scrapImageUrl, setScrapImageUrl] = useState("");
   const [depositUploading, setDepositUploading] = useState(false);
@@ -88,7 +91,13 @@ export function OrderForm({ products, selectedProductId }: { products: Product[]
           <Input name="customerName" required />
         </Field>
         <Field label="هاتف العميل" error={state.errors?.customerPhone}>
-          <Input name="customerPhone" required />
+          <Input name="customerPhone" required inputMode="numeric" pattern="[0-9]{8,20}" placeholder="01000000000" />
+        </Field>
+        <Field label="هاتف إضافي">
+          <Input name="customerPhone2" inputMode="numeric" pattern="[0-9]{8,20}" placeholder="اختياري" />
+        </Field>
+        <Field label="هاتف إضافي آخر">
+          <Input name="customerPhone3" inputMode="numeric" pattern="[0-9]{8,20}" placeholder="اختياري" />
         </Field>
         <Field label="المحافظة" error={state.errors?.governorate}>
           <Input name="governorate" required />
@@ -205,6 +214,10 @@ export function OrderForm({ products, selectedProductId }: { products: Product[]
         </label>
       </section>
 
+      <p className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm font-bold leading-6 text-amber-800">
+        إذا لم يوجد عربون فالطلب على مسؤولية المسوق، وإذا لم يتم تسليم الطلب يتم خصم 300 جنيه من المسوق خارج النظام.
+      </p>
+
       <UploadCard
         label="صورة العربون"
         description="ارفع صورة إيصال أو تحويل العربون إن وجد."
@@ -236,8 +249,43 @@ export function OrderForm({ products, selectedProductId }: { products: Product[]
           <Field label="الأمبير">
             <Input name="scrapAmpere" type="number" min={0} />
           </Field>
+          <Field label="وزن الكهنة بالكيلو">
+            <Input
+              name="scrapWeightKg"
+              type="number"
+              min={0}
+              step="0.01"
+              value={scrapWeightKg}
+              onChange={(event) => {
+                const nextWeight = Math.max(0, Number(event.currentTarget.value || 0));
+                setScrapWeightKg(nextWeight);
+                setScrapEstimatedValue(Math.round(nextWeight * scrapKiloPrice * 100) / 100);
+              }}
+            />
+          </Field>
+          <Field label="سعر كيلو الكهنة">
+            <Input
+              name="scrapKiloPrice"
+              type="number"
+              min={0}
+              step="0.01"
+              value={scrapKiloPrice}
+              onChange={(event) => {
+                const nextPrice = Math.max(0, Number(event.currentTarget.value || 0));
+                setScrapKiloPrice(nextPrice);
+                setScrapEstimatedValue(Math.round(scrapWeightKg * nextPrice * 100) / 100);
+              }}
+            />
+          </Field>
           <Field label="القيمة المتوقعة">
-            <Input name="scrapEstimatedValue" type="number" min={0} />
+            <Input
+              name="scrapEstimatedValue"
+              type="number"
+              min={0}
+              step="0.01"
+              value={scrapEstimatedValue}
+              onChange={(event) => setScrapEstimatedValue(Math.max(0, Number(event.currentTarget.value || 0)))}
+            />
           </Field>
         </div>
         <div className="mt-4">

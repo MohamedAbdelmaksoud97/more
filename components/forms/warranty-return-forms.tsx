@@ -73,7 +73,7 @@ export function WarrantyReturnCreateForm({ orders }: { orders: Order[] }) {
         </section>
       ) : (
         <p className="rounded-md border border-amber-200 bg-amber-50 p-3 text-sm font-bold text-amber-800">
-          في الاستبدال المباشر سيظهر للمنسق أن البطارية القديمة يجب استلامها مع تسليم البديل.
+          مسار الاستبدال المباشر يعني أن البطارية البديلة ستخرج للعميل الآن، والمندوب يجب أن يستلم البطارية القديمة من العميل في نفس وقت تسليم البديل.
         </p>
       )}
 

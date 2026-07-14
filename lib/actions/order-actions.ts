@@ -130,6 +130,9 @@ export async function createOrderAction(_state: OrderActionState, formData: Form
     customer: {
       customerName: parsed.data.customerName,
       customerPhone: parsed.data.customerPhone,
+      customerPhones: [parsed.data.customerPhone, parsed.data.customerPhone2, parsed.data.customerPhone3].filter(
+        Boolean,
+      ) as string[],
       governorate: parsed.data.governorate,
       area: parsed.data.area,
       address: parsed.data.address,
@@ -154,6 +157,8 @@ export async function createOrderAction(_state: OrderActionState, formData: Form
       hasScrap: parsed.data.hasScrap,
       scrapType: parsed.data.scrapType,
       scrapAmpere: parsed.data.scrapAmpere,
+      scrapWeightKg: parsed.data.scrapWeightKg,
+      scrapKiloPrice: parsed.data.scrapKiloPrice,
       scrapEstimatedValue: parsed.data.scrapEstimatedValue,
       scrapImageUrl: parsed.data.scrapImageUrl,
       scrapNotes: parsed.data.scrapNotes,
@@ -197,6 +202,26 @@ export async function createOrderAction(_state: OrderActionState, formData: Form
         ),
       ),
     );
+    if (!parsed.data.hasDeposit || parsed.data.depositAmount <= 0) {
+      await Promise.all(
+        (["coordinator", "admin"] as const).map((recipientRole) =>
+          createNotification(
+            {
+              title: "طلب بدون عربون",
+              body: `طلب ${order.orderNumber} تم إنشاؤه بدون عربون. التنبيه: عدم التسليم قد يسبب خصم 300 جنيه خارج النظام على المسوق.`,
+              type: "ORDER_CREATED_NO_DEPOSIT",
+              recipientRole,
+              actorUserId: user.uid,
+              actorName: user.name,
+              relatedEntityType: "order",
+              relatedEntityId: ref.id,
+              requiresAction: recipientRole === "coordinator",
+            },
+            { mirrorToAdmin: false },
+          ),
+        ),
+      );
+    }
     revalidatePath("/marketer/orders");
     revalidatePath("/admin/orders");
     revalidatePath("/coordinator/orders");
@@ -639,6 +664,65 @@ export async function updateOrderStatusAction(formData: FormData) {
   revalidatePath(`/marketer/orders/${order.id}`);
   revalidatePath("/coordinator/orders");
   return { ok: true, message: "تم تحديث الطلب" };
+}
+
+export async function requestOrderEditAction(formData: FormData) {
+  const user = await requireRole(["marketer"]);
+  const orderId = String(formData.get("orderId") ?? "");
+  const notes = String(formData.get("notes") ?? "").trim();
+  if (!orderId || notes.length < 5) return { ok: false, message: "اكتب تفاصيل التعديل المطلوب" };
+  const order = await getOrder(user, orderId);
+  if (!order || order.marketerId !== user.uid) return { ok: false, message: "الطلب غير موجود" };
+  if (order.status === "PENDING_REVIEW") {
+    return { ok: false, message: "هذا الطلب لم يعتمد بعد. يمكن تعديله مباشرة من شاشة التحرير عند توفرها." };
+  }
+  if (!hasFirebaseAdminConfig()) return { ok: true, message: "تم تسجيل طلب التعديل في وضع العرض التجريبي" };
+  const db = getAdminDb();
+  if (!db) return { ok: false, message: "Firebase Admin غير مهيأ" };
+
+  const now = new Date().toISOString();
+  const editRef = db.collection("orderEditRequests").doc();
+  await editRef.set({
+    orderId,
+    orderNumber: order.orderNumber,
+    marketerId: user.uid,
+    marketerName: user.name,
+    notes,
+    status: "OPEN",
+    createdAt: now,
+    updatedAt: now,
+  });
+
+  await Promise.all(
+    (["coordinator", "admin"] as const).map((recipientRole) =>
+      createNotification(
+        {
+          title: "طلب تعديل أوردر",
+          body: `${user.name} طلب تعديل ${order.orderNumber ?? order.id}: ${notes}`,
+          type: "ORDER_CREATED",
+          recipientRole,
+          actorUserId: user.uid,
+          actorName: user.name,
+          relatedEntityType: "order",
+          relatedEntityId: orderId,
+          requiresAction: true,
+        },
+        { mirrorToAdmin: false },
+      ),
+    ),
+  );
+  await writeAudit({
+    actorUserId: user.uid,
+    actorRole: user.role,
+    action: "order.edit_request",
+    entityType: "order",
+    entityId: orderId,
+    after: { requestId: editRef.id, notes },
+  });
+  revalidatePath(`/marketer/orders/${orderId}`);
+  revalidatePath(`/admin/orders/${orderId}`);
+  revalidatePath(`/coordinator/orders/${orderId}`);
+  return { ok: true, message: "تم إرسال طلب التعديل للمدير والمنسق" };
 }
 
 export async function returnToStockAction(formData: FormData) {

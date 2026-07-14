@@ -1,5 +1,8 @@
 import { z } from "zod";
 
+const englishPhoneRegex = /^[0-9]{8,20}$/;
+const arabicTextRegex = /^[\u0600-\u06FF0-9\s،,.()\-\/]+$/;
+
 export const roleSchema = z.enum(["admin", "coordinator", "marketer"]);
 export const userStatusSchema = z.enum([
   "PENDING_EMAIL_VERIFICATION",
@@ -55,16 +58,21 @@ export const imageRequestSchema = z.object({
 export const registerSchema = z.object({
   name: z.string().trim().min(2, "الاسم مطلوب").max(80),
   email: z.string().trim().email("البريد الإلكتروني غير صحيح"),
-  phone: z.string().trim().min(8, "رقم الهاتف مطلوب").max(20),
+  phone: z.string().trim().regex(englishPhoneRegex, "رقم الهاتف يجب أن يكون أرقام إنجليزية فقط"),
+  address: z.string().trim().min(5, "العنوان مطلوب").max(300).regex(arabicTextRegex, "العنوان يجب أن يكون بالعربية"),
+  nationalIdImageUrl: z.string().url().optional().or(z.literal("").transform(() => undefined)),
+  addressProofImageUrl: z.string().url().optional().or(z.literal("").transform(() => undefined)),
   password: z.string().min(8, "كلمة المرور لا تقل عن 8 أحرف"),
 });
 
 export const orderSchema = z.object({
-  customerName: z.string().trim().min(2, "اسم العميل مطلوب").max(100),
-  customerPhone: z.string().trim().min(8, "رقم العميل مطلوب").max(20),
+  customerName: z.string().trim().min(2, "اسم العميل مطلوب").max(100).regex(arabicTextRegex, "اسم العميل يجب أن يكون بالعربية"),
+  customerPhone: z.string().trim().regex(englishPhoneRegex, "رقم العميل يجب أن يكون أرقام إنجليزية فقط"),
+  customerPhone2: z.string().trim().regex(englishPhoneRegex, "رقم العميل الإضافي يجب أن يكون أرقام إنجليزية فقط").optional().or(z.literal("").transform(() => undefined)),
+  customerPhone3: z.string().trim().regex(englishPhoneRegex, "رقم العميل الإضافي يجب أن يكون أرقام إنجليزية فقط").optional().or(z.literal("").transform(() => undefined)),
   governorate: z.string().trim().min(2, "المحافظة مطلوبة").max(80),
   area: z.string().trim().min(2, "المنطقة مطلوبة").max(100),
-  address: z.string().trim().min(5, "العنوان مطلوب").max(300),
+  address: z.string().trim().min(5, "العنوان مطلوب").max(300).regex(arabicTextRegex, "العنوان يجب أن يكون بالعربية"),
   notes: z.string().trim().max(1000).optional(),
   productId: z.string().min(1, "اختر المنتج"),
   quantity: z.coerce.number().int().positive("الكمية غير صحيحة"),
@@ -79,6 +87,8 @@ export const orderSchema = z.object({
   hasScrap: z.coerce.boolean().default(false),
   scrapType: z.string().trim().max(80).optional(),
   scrapAmpere: z.coerce.number().min(0).optional(),
+  scrapWeightKg: z.coerce.number().min(0).optional(),
+  scrapKiloPrice: z.coerce.number().min(0).optional(),
   scrapEstimatedValue: z.coerce.number().min(0).optional(),
   scrapImageUrl: z.string().url().optional().or(z.literal("").transform(() => undefined)),
   scrapNotes: z.string().trim().max(1000).optional(),
@@ -165,7 +175,7 @@ export const warrantyReplacementFulfillmentSchema = z.object({
 });
 
 export const cloudinaryUploadSchema = z.object({
-  folder: z.enum(["products", "orders", "shipping", "receipts", "deposits", "scrap", "expenses", "returns"]),
+  folder: z.enum(["products", "orders", "shipping", "receipts", "deposits", "scrap", "expenses", "returns", "users"]),
   fileType: z.string().regex(/^(image\/(png|jpeg|jpg|webp)|application\/pdf)$/),
   fileSize: z.number().max(20 * 1024 * 1024, "حجم الملف لا يتجاوز 20 ميجابايت"),
 });

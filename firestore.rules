@@ -121,6 +121,9 @@ service cloud.firestore {
           'name',
           'email',
           'phone',
+          'address',
+          'nationalIdImageUrl',
+          'addressProofImageUrl',
           'role',
           'status',
           'fcmTokens',
@@ -129,7 +132,9 @@ service cloud.firestore {
           'createdAt',
           'updatedAt',
           'approvedBy',
-          'approvedAt'
+          'approvedAt',
+          'emailVerified',
+          'emailVerifiedAt'
         ]) &&
         hasRequiredFields(['uid', 'name', 'email', 'role', 'status', 'createdAt', 'updatedAt']) &&
         data.uid is string &&
@@ -141,6 +146,11 @@ service cloud.firestore {
         validRole(data.role) &&
         validUserStatus(data.status) &&
         optionalString('phone', 20) &&
+        optionalString('address', 300) &&
+        (!(data.emailVerified is bool) || data.emailVerified is bool) &&
+        optionalString('emailVerifiedAt', 40) &&
+        optionalUrl('nationalIdImageUrl') &&
+        optionalUrl('addressProofImageUrl') &&
         (!(data.commissionType is string) || data.commissionType in ['FIXED', 'PERCENTAGE']) &&
         (!(data.commissionValue is number) || (data.commissionValue >= 0 && data.commissionValue <= 1000000));
     }
@@ -215,6 +225,7 @@ service cloud.firestore {
         data.customer.customerName.size() <= 100 &&
         data.customer.customerPhone is string &&
         data.customer.customerPhone.size() <= 20 &&
+        (!(data.customer.customerPhones is list) || data.customer.customerPhones.size() <= 3) &&
         data.productId is string &&
         data.productId.size() <= 128 &&
         data.quantity is int &&
@@ -359,6 +370,11 @@ service cloud.firestore {
     }
 
     match /warrantyReturns/{returnId} {
+      allow read: if isAdmin() || isCoordinator() || (isMarketer() && resource.data.marketerId == request.auth.uid);
+      allow create, update, delete: if false;
+    }
+
+    match /orderEditRequests/{requestId} {
       allow read: if isAdmin() || isCoordinator() || (isMarketer() && resource.data.marketerId == request.auth.uid);
       allow create, update, delete: if false;
     }

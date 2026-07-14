@@ -7,7 +7,10 @@ const schema = z.object({
   idToken: z.string().min(20).optional(),
   name: z.string().min(2).max(80),
   email: z.string().email(),
-  phone: z.string().min(8).max(20),
+  phone: z.string().regex(/^[0-9]{8,20}$/),
+  address: z.string().min(5).max(300),
+  nationalIdImageUrl: z.string().url().optional(),
+  addressProofImageUrl: z.string().url().optional(),
   password: z.string().min(8).optional(),
 });
 
@@ -70,6 +73,9 @@ export async function POST(request: Request) {
       name: parsed.data.name,
       email: parsed.data.email,
       phone: parsed.data.phone,
+      address: parsed.data.address,
+      ...(parsed.data.nationalIdImageUrl ? { nationalIdImageUrl: parsed.data.nationalIdImageUrl } : {}),
+      ...(parsed.data.addressProofImageUrl ? { addressProofImageUrl: parsed.data.addressProofImageUrl } : {}),
       role,
       status,
       emailVerified: authUser.emailVerified,

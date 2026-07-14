@@ -39,8 +39,8 @@ export const commissionStatusLabels: Record<string, string> = {
 };
 
 export const warrantyReturnTypeLabels: Record<string, string> = {
-  INSPECTION_FIRST: "فحص قبل الاستبدال",
-  DIRECT_REPLACEMENT: "استبدال مباشر",
+  INSPECTION_FIRST: "مسار الفحص أولا",
+  DIRECT_REPLACEMENT: "مسار الاستبدال المباشر",
 };
 
 export const warrantyReturnStatusLabels: Record<string, string> = {

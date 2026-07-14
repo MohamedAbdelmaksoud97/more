@@ -10,7 +10,7 @@ import {
   updateProfile,
 } from "firebase/auth";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, MailCheck } from "lucide-react";
+import { ArrowLeft, CheckCircle2, MailCheck, UploadCloud, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Field, Input } from "@/components/ui/form";
 import { COMPANY } from "@/lib/constants";
@@ -150,6 +150,27 @@ export function RegisterForm() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [nationalIdFile, setNationalIdFile] = useState<File | null>(null);
+  const [addressProofFile, setAddressProofFile] = useState<File | null>(null);
+
+  async function uploadRegistrationFile(file: File, idToken: string) {
+    if (!file.type.match(/^(image\/(png|jpeg|jpg|webp)|application\/pdf)$/)) {
+      throw new Error("يسمح برفع صورة أو PDF فقط لمستندات التسجيل.");
+    }
+    if (file.size > 20 * 1024 * 1024) {
+      throw new Error("حجم الملف لا يجب أن يتجاوز 20 ميجابايت.");
+    }
+    const body = new FormData();
+    body.set("file", file);
+    const response = await fetch("/api/upload/registration", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${idToken}` },
+      body,
+    });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(result.error ?? "تعذر رفع مستند التسجيل");
+    return String(result.url);
+  }
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -166,19 +187,27 @@ export function RegisterForm() {
     const payload = {
       name: form.get("name"),
       phone: form.get("phone"),
+      address: form.get("address"),
       email: form.get("email"),
       password: form.get("password"),
     };
 
     try {
+      if (!nationalIdFile || !addressProofFile) {
+        throw new Error("ارفع صورة البطاقة وصورة إثبات العنوان قبل التسجيل.");
+      }
       const credential = await createUserWithEmailAndPassword(auth, String(payload.email), String(payload.password));
       await updateProfile(credential.user, { displayName: String(payload.name) });
       await sendVerificationEmail(credential.user);
       const token = await credential.user.getIdToken(true);
+      const [nationalIdImageUrl, addressProofImageUrl] = await Promise.all([
+        uploadRegistrationFile(nationalIdFile, token),
+        uploadRegistrationFile(addressProofFile, token),
+      ]);
       const response = await fetch("/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ idToken: token, ...payload }),
+        body: JSON.stringify({ idToken: token, ...payload, nationalIdImageUrl, addressProofImageUrl }),
       });
       const result = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(result.error ?? "تعذر تسجيل الحساب");
@@ -195,7 +224,32 @@ export function RegisterForm() {
     }
   }
 
-  return <AuthCard title="إنشاء حساب جديد" onSubmit={submit} loading={loading} error={error} submitLabel="إرسال رابط التأكيد" register />;
+  return (
+    <AuthCard
+      title="إنشاء حساب جديد"
+      onSubmit={submit}
+      loading={loading}
+      error={error}
+      submitLabel="إرسال رابط التأكيد"
+      register
+      registrationDocs={
+        <div className="grid gap-3">
+          <RegistrationFileField
+            label="صورة البطاقة"
+            file={nationalIdFile}
+            onFile={setNationalIdFile}
+            onClear={() => setNationalIdFile(null)}
+          />
+          <RegistrationFileField
+            label="إثبات العنوان"
+            file={addressProofFile}
+            onFile={setAddressProofFile}
+            onClear={() => setAddressProofFile(null)}
+          />
+        </div>
+      }
+    />
+  );
 }
 
 function AuthCard({
@@ -205,6 +259,7 @@ function AuthCard({
   error,
   submitLabel,
   register,
+  registrationDocs,
 }: {
   title: string;
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
@@ -212,6 +267,7 @@ function AuthCard({
   error: string;
   submitLabel: string;
   register?: boolean;
+  registrationDocs?: React.ReactNode;
 }) {
   return (
     <div className="relative min-h-screen overflow-hidden bg-[radial-gradient(circle_at_top_right,#dff3ff,transparent_36%),linear-gradient(135deg,#f8fbff,#eef4f7)] px-4 py-8">
@@ -219,7 +275,7 @@ function AuthCard({
         <section className="hidden lg:block">
           <div className="max-w-xl">
             <Image
-              src="/more-power-more-energy.png"
+              src="/more-power-more-energy-transparent.png"
               alt="MORE Energy"
               width={360}
               height={220}
@@ -262,8 +318,12 @@ function AuthCard({
                   <Input name="name" required minLength={2} />
                 </Field>
                 <Field label="الهاتف">
-                  <Input name="phone" required />
+                  <Input name="phone" required inputMode="numeric" pattern="[0-9]{8,20}" placeholder="01000000000" />
                 </Field>
+                <Field label="العنوان">
+                  <Input name="address" required minLength={5} dir="rtl" placeholder="العنوان باللغة العربية" />
+                </Field>
+                {registrationDocs}
               </>
             ) : null}
             <Field label="البريد الإلكتروني">
@@ -298,6 +358,54 @@ function AuthCard({
           </div>
         </form>
       </div>
+    </div>
+  );
+}
+
+function RegistrationFileField({
+  label,
+  file,
+  onFile,
+  onClear,
+}: {
+  label: string;
+  file: File | null;
+  onFile: (file: File) => void;
+  onClear: () => void;
+}) {
+  return (
+    <div className="rounded-lg border border-dashed border-blue-200 bg-blue-50/60 p-3">
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <p className="text-sm font-black text-slate-900">{label}</p>
+          <p className="mt-1 text-xs font-semibold text-slate-500">صورة واضحة أو ملف PDF.</p>
+        </div>
+        <label className="inline-flex h-9 cursor-pointer items-center gap-2 rounded-md bg-blue-700 px-3 text-xs font-bold text-white hover:bg-blue-800">
+          <UploadCloud className="size-4" />
+          اختيار
+          <input
+            type="file"
+            accept="image/png,image/jpeg,image/webp,application/pdf"
+            className="sr-only"
+            onChange={(event) => {
+              const selectedFile = event.currentTarget.files?.[0];
+              if (selectedFile) onFile(selectedFile);
+              event.currentTarget.value = "";
+            }}
+          />
+        </label>
+      </div>
+      {file ? (
+        <div className="mt-3 flex items-center justify-between rounded-md border border-emerald-200 bg-white p-2 text-xs font-bold text-emerald-700">
+          <span className="inline-flex min-w-0 items-center gap-2">
+            <CheckCircle2 className="size-4 shrink-0" />
+            <span className="truncate">{file.name}</span>
+          </span>
+          <button type="button" onClick={onClear} className="grid size-7 place-items-center rounded-full text-red-600 hover:bg-red-50">
+            <X className="size-4" />
+          </button>
+        </div>
+      ) : null}
     </div>
   );
 }
