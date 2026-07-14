@@ -38,6 +38,26 @@ export const commissionStatusLabels: Record<string, string> = {
   DEDUCTED: "مخصومة",
 };
 
+export const warrantyReturnTypeLabels: Record<string, string> = {
+  INSPECTION_FIRST: "فحص قبل الاستبدال",
+  DIRECT_REPLACEMENT: "استبدال مباشر",
+};
+
+export const warrantyReturnStatusLabels: Record<string, string> = {
+  RETURN_REQUESTED: "طلب مرتجع جديد",
+  OLD_BATTERY_IN_TRANSIT: "البطارية القديمة في الطريق",
+  OLD_BATTERY_RECEIVED: "تم استلام القديمة",
+  RETURN_APPROVED: "تم قبول المرتجع",
+  RETURN_REJECTED: "تم رفض المرتجع",
+  REPLACEMENT_PENDING_REVIEW: "استبدال بانتظار المراجعة",
+  REPLACEMENT_APPROVED_RESERVED: "استبدال مقبول ومحجوز",
+  REPLACEMENT_SHIPPED: "تم شحن البديل",
+  REPLACEMENT_DELIVERED: "تم تسليم البديل",
+  USAGE_FEE_COLLECTED: "تم تحصيل الاستهلاك",
+  REPLACEMENT_COMPLETED: "اكتمل الاستبدال",
+  CANCELLED: "ملغي",
+};
+
 export const locationLabels: Record<string, string> = {
   SHOWROOM: "المعرض",
   WAREHOUSE: "المخزن",
@@ -54,6 +74,7 @@ export const adminNav: NavSection[] = [
       { href: "/admin/inventory", label: "المخزون" },
       { href: "/admin/orders", label: "الطلبات" },
       { href: "/admin/orders/new", label: "طلب جديد" },
+      { href: "/admin/returns", label: "مرتجعات الضمان" },
       { href: "/admin/notifications", label: "الإشعارات" },
     ],
   },
@@ -78,7 +99,7 @@ export const coordinatorNav: NavSection[] = [
       { href: "/coordinator/orders/new", label: "طلب جديد" },
       { href: "/coordinator/orders/pending", label: "مراجعة الطلبات" },
       { href: "/coordinator/orders/shipping", label: "الشحن" },
-      { href: "/coordinator/orders/returns", label: "المرتجعات" },
+      { href: "/coordinator/returns", label: "مرتجعات الضمان" },
       { href: "/coordinator/expenses", label: "المصروفات" },
     ],
   },
@@ -101,6 +122,7 @@ export const marketerNav: NavSection[] = [
       { href: "/marketer/products", label: "المنتجات" },
       { href: "/marketer/orders", label: "طلباتي" },
       { href: "/marketer/orders/new", label: "طلب جديد" },
+      { href: "/marketer/returns", label: "مرتجعات الضمان" },
     ],
   },
   {

@@ -18,6 +18,7 @@ export function OrderForm({ products, selectedProductId }: { products: Product[]
   const [selectedLocation, setSelectedLocation] = useState<InventoryLocation | "">("");
   const [quantity, setQuantity] = useState(1);
   const [discount, setDiscount] = useState(0);
+  const [warrantyMonths, setWarrantyMonths] = useState(12);
   const [depositAmount, setDepositAmount] = useState(0);
   const [depositImageUrl, setDepositImageUrl] = useState("");
   const [scrapImageUrl, setScrapImageUrl] = useState("");
@@ -176,6 +177,17 @@ export function OrderForm({ products, selectedProductId }: { products: Product[]
             max={selectedProduct?.price ?? undefined}
             value={discount}
             onChange={(event) => setDiscount(Math.max(0, Number(event.currentTarget.value || 0)))}
+          />
+        </Field>
+        <Field label="مدة الضمان بالشهور" error={state.errors?.warrantyMonths}>
+          <Input
+            name="warrantyMonths"
+            type="number"
+            min={1}
+            max={120}
+            value={warrantyMonths}
+            onChange={(event) => setWarrantyMonths(Math.max(1, Number(event.currentTarget.value || 1)))}
+            required
           />
         </Field>
         <Field label="عربون">

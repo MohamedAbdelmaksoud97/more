@@ -10,6 +10,12 @@ import type {
 } from "@/lib/types";
 
 const now = new Date().toISOString();
+const demoWarrantyEndsAt = (() => {
+  const date = new Date();
+  date.setMonth(date.getMonth() + 12);
+  date.setHours(23, 59, 59, 999);
+  return date.toISOString();
+})();
 
 export const demoCurrentUser: UserProfile = {
   uid: "demo-admin",
@@ -134,6 +140,8 @@ export const demoOrders: Order[] = [
     selectedLocation: "WAREHOUSE",
     finalPrice: 8200,
     discount: 0,
+    warrantyMonths: 12,
+    warrantyEndsAt: demoWarrantyEndsAt,
     payment: {
       hasDeposit: true,
       depositAmount: 1000,
@@ -176,6 +184,8 @@ export const demoOrders: Order[] = [
     selectedLocation: "SHOWROOM",
     finalPrice: 24000,
     discount: 500,
+    warrantyMonths: 6,
+    warrantyEndsAt: demoWarrantyEndsAt,
     payment: {
       hasDeposit: false,
       depositAmount: 0,

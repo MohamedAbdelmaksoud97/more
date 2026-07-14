@@ -66,6 +66,13 @@ function createOrderNumber(docId: string) {
   return `MORE-${year}${month}${day}-${docId.slice(0, 5).toUpperCase()}`;
 }
 
+function addMonths(date: Date, months: number) {
+  const next = new Date(date);
+  next.setMonth(next.getMonth() + months);
+  next.setHours(23, 59, 59, 999);
+  return next;
+}
+
 function orderTotal(order: Pick<Order, "finalPrice" | "quantity">) {
   return order.finalPrice * order.quantity;
 }
@@ -115,6 +122,8 @@ export async function createOrderAction(_state: OrderActionState, formData: Form
     }
     const remainingAmount = finalUnitPrice * parsed.data.quantity - parsed.data.depositAmount;
 
+    const now = new Date();
+    const nowIso = now.toISOString();
     const ref = db.collection("orders").doc();
     const order: Omit<Order, "id"> = {
     orderNumber: createOrderNumber(ref.id),
@@ -132,6 +141,8 @@ export async function createOrderAction(_state: OrderActionState, formData: Form
     selectedLocation: parsed.data.selectedLocation,
     finalPrice: finalUnitPrice,
     discount: parsed.data.discount,
+    warrantyMonths: parsed.data.warrantyMonths,
+    warrantyEndsAt: addMonths(now, parsed.data.warrantyMonths).toISOString(),
     payment: {
       hasDeposit: parsed.data.hasDeposit,
       depositAmount: parsed.data.depositAmount,
@@ -154,9 +165,9 @@ export async function createOrderAction(_state: OrderActionState, formData: Form
     isPaymentCollected: false,
     commissionStatus: "EXPECTED",
     commissionAmount: 0,
-    timeline: [{ label: "تم إنشاء الطلب", actorName: user.name, at: new Date().toISOString() }],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+    timeline: [{ label: "تم إنشاء الطلب", actorName: user.name, at: nowIso, details: `مدة الضمان: ${parsed.data.warrantyMonths} شهر` }],
+    createdAt: nowIso,
+    updatedAt: nowIso,
     };
 
     await ref.set(withoutUndefined(order));
@@ -664,7 +675,6 @@ export async function returnToStockAction(formData: FormData) {
     entityType: "order",
     entityId: orderId,
   });
-  revalidatePath("/coordinator/orders/returns");
   return { ok: true, message: "تم إرجاع الكمية للمخزون" };
 }
 

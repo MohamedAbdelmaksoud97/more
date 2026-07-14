@@ -41,6 +41,22 @@ export type CommissionStatus =
   | "CANCELLED"
   | "DEDUCTED";
 
+export type WarrantyReturnType = "INSPECTION_FIRST" | "DIRECT_REPLACEMENT";
+
+export type WarrantyReturnStatus =
+  | "RETURN_REQUESTED"
+  | "OLD_BATTERY_IN_TRANSIT"
+  | "OLD_BATTERY_RECEIVED"
+  | "RETURN_APPROVED"
+  | "RETURN_REJECTED"
+  | "REPLACEMENT_PENDING_REVIEW"
+  | "REPLACEMENT_APPROVED_RESERVED"
+  | "REPLACEMENT_SHIPPED"
+  | "REPLACEMENT_DELIVERED"
+  | "USAGE_FEE_COLLECTED"
+  | "REPLACEMENT_COMPLETED"
+  | "CANCELLED";
+
 export type NotificationType =
   | "USER_REGISTERED"
   | "USER_APPROVED"
@@ -63,6 +79,12 @@ export type NotificationType =
   | "COMMISSION_APPROVED"
   | "COMMISSION_PAID"
   | "COMMISSION_DEDUCTED"
+  | "WARRANTY_RETURN_CREATED"
+  | "WARRANTY_RETURN_RECEIVED"
+  | "WARRANTY_RETURN_APPROVED"
+  | "WARRANTY_RETURN_REJECTED"
+  | "WARRANTY_REPLACEMENT_SHIPPED"
+  | "WARRANTY_REPLACEMENT_COMPLETED"
   | "SCRAP_ADDED"
   | "SCRAP_RECEIVED"
   | "SCRAP_REJECTED"
@@ -185,6 +207,8 @@ export interface Order {
   selectedLocation: InventoryLocation;
   finalPrice: number;
   discount?: number;
+  warrantyMonths?: number;
+  warrantyEndsAt?: string;
   payment: PaymentInfo;
   scrap: ScrapInfo;
   status: OrderStatus;
@@ -213,6 +237,38 @@ export interface Commission {
   createdAt: string;
   updatedAt: string;
   paidAt?: string;
+}
+
+export interface WarrantyReturn {
+  id: string;
+  returnNumber: string;
+  originalOrderId: string;
+  originalOrderNumber?: string;
+  originalProductId: string;
+  originalProductName: string;
+  replacementProductId?: string;
+  replacementProductName?: string;
+  replacementLocation?: InventoryLocation;
+  customer: CustomerInfo;
+  marketerId: string;
+  marketerName: string;
+  coordinatorId?: string;
+  type: WarrantyReturnType;
+  status: WarrantyReturnStatus;
+  warrantyUntil?: string;
+  reason: string;
+  usageFee: number;
+  collectedUsageFee: number;
+  oldBatteryShippingBillUrl?: string;
+  oldBatteryShippingTrackingNumber?: string;
+  replacementShippingBillUrl?: string;
+  oldBatteryReceived: boolean;
+  oldBatteryReceivedAt?: string;
+  rejectionReason?: string;
+  notes?: string;
+  timeline: OrderTimelineEvent[];
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface Target {
@@ -248,7 +304,7 @@ export interface NotificationItem {
   recipientRole?: Role;
   actorUserId: string;
   actorName: string;
-  relatedEntityType?: "order" | "product" | "user" | "report" | "commission";
+  relatedEntityType?: "order" | "product" | "user" | "report" | "commission" | "warrantyReturn";
   relatedEntityId?: string;
   isRead: boolean;
   requiresAction: boolean;

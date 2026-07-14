@@ -71,6 +71,7 @@ export const orderSchema = z.object({
   selectedLocation: z.enum(["SHOWROOM", "WAREHOUSE", "SUPPLIER_DIRECT"]),
   finalPrice: z.coerce.number().optional(),
   discount: z.coerce.number().min(0).default(0),
+  warrantyMonths: z.coerce.number().int().min(1, "مدة الضمان مطلوبة").max(120, "مدة الضمان طويلة جدا"),
   hasDeposit: z.coerce.boolean().default(false),
   depositAmount: z.coerce.number().min(0).default(0),
   depositImageUrl: z.string().url().optional().or(z.literal("").transform(() => undefined)),
@@ -128,8 +129,43 @@ export const resetTargetSchema = z.object({
   targetId: z.string().min(1, "الهدف غير صحيح"),
 });
 
+export const warrantyReturnCreateSchema = z.object({
+  originalOrderId: z.string().min(1, "اختر الطلب الأصلي"),
+  type: z.enum(["INSPECTION_FIRST", "DIRECT_REPLACEMENT"]),
+  reason: z.string().trim().min(5, "سبب المرتجع مطلوب").max(1000),
+  usageFee: z.coerce.number().min(0, "قيمة الاستهلاك غير صحيحة").default(0),
+  oldBatteryShippingBillUrl: z.string().url().optional().or(z.literal("").transform(() => undefined)),
+  oldBatteryShippingTrackingNumber: z.string().trim().max(120).optional(),
+  notes: z.string().trim().max(1000).optional(),
+});
+
+export const warrantyReturnDecisionSchema = z.object({
+  returnId: z.string().min(1, "طلب المرتجع غير صحيح"),
+  decision: z.enum(["RECEIVE_OLD", "APPROVE", "REJECT"]),
+  rejectionReason: z.string().trim().max(500).optional(),
+});
+
+export const warrantyReplacementSchema = z.object({
+  returnId: z.string().min(1, "طلب المرتجع غير صحيح"),
+  replacementProductId: z.string().min(1, "اختر البطارية البديلة"),
+  replacementLocation: z.enum(["SHOWROOM", "WAREHOUSE", "SUPPLIER_DIRECT"]),
+  usageFee: z.coerce.number().min(0, "قيمة الاستهلاك غير صحيحة"),
+  notes: z.string().trim().max(1000).optional(),
+});
+
+export const warrantyReplacementShippingSchema = z.object({
+  returnId: z.string().min(1, "طلب المرتجع غير صحيح"),
+  documentUrl: z.string().url("ارفع بوليصة شحن صحيحة"),
+});
+
+export const warrantyReplacementFulfillmentSchema = z.object({
+  returnId: z.string().min(1, "طلب المرتجع غير صحيح"),
+  collectedUsageFee: z.coerce.number().min(0, "قيمة التحصيل غير صحيحة"),
+  oldBatteryReceived: z.coerce.boolean().default(false),
+});
+
 export const cloudinaryUploadSchema = z.object({
-  folder: z.enum(["products", "orders", "shipping", "receipts", "deposits", "scrap", "expenses"]),
+  folder: z.enum(["products", "orders", "shipping", "receipts", "deposits", "scrap", "expenses", "returns"]),
   fileType: z.string().regex(/^(image\/(png|jpeg|jpg|webp)|application\/pdf)$/),
   fileSize: z.number().max(20 * 1024 * 1024, "حجم الملف لا يتجاوز 20 ميجابايت"),
 });

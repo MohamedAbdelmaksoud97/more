@@ -72,6 +72,8 @@ export function OrderDetailView({
             <Info label="الكمية" value={order.quantity} />
             <Info label="الموقع" value={locationLabels[order.selectedLocation]} />
             <Info label="منشئ الطلب" value={order.marketerName} />
+            <Info label="مدة الضمان" value={order.warrantyMonths ? `${order.warrantyMonths} شهر` : "غير مسجلة"} />
+            <Info label="نهاية الضمان" value={order.warrantyEndsAt ? formatDate(order.warrantyEndsAt) : "غير مسجلة"} />
             {order.rejectionReason ? <Info label="سبب الرفض" value={order.rejectionReason} /> : null}
           </div>
         </Panel>

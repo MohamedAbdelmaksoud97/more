@@ -13,6 +13,7 @@ import type {
   Role,
   Target,
   UserProfile,
+  WarrantyReturn,
 } from "@/lib/types";
 import {
   demoExpenses,
@@ -147,6 +148,32 @@ export async function getOrder(viewer: UserProfile, id: string): Promise<Order |
   if (!snap.exists) return null;
   const order = fromDoc<Order>(snap);
   return canReadOrder(viewer, order.marketerId) ? order : null;
+}
+
+function canReadWarrantyReturn(viewer: UserProfile, item: Pick<WarrantyReturn, "marketerId">) {
+  return viewer.role === "admin" || viewer.role === "coordinator" || item.marketerId === viewer.uid;
+}
+
+export async function listWarrantyReturns(viewer: UserProfile): Promise<WarrantyReturn[]> {
+  const db = dbOrNull();
+  if (!db) return [];
+
+  let query: FirebaseFirestore.Query = db.collection("warrantyReturns");
+  if (viewer.role === "marketer") query = query.where("marketerId", "==", viewer.uid);
+  const snap = await query.limit(300).get();
+  return snap.docs
+    .map((doc) => fromDoc<WarrantyReturn>(doc))
+    .filter((item) => canReadWarrantyReturn(viewer, item))
+    .sort((a, b) => dateMillis(b.updatedAt) - dateMillis(a.updatedAt));
+}
+
+export async function getWarrantyReturn(viewer: UserProfile, id: string): Promise<WarrantyReturn | null> {
+  const db = dbOrNull();
+  if (!db) return null;
+  const snap = await db.collection("warrantyReturns").doc(id).get();
+  if (!snap.exists) return null;
+  const item = fromDoc<WarrantyReturn>(snap);
+  return canReadWarrantyReturn(viewer, item) ? item : null;
 }
 
 export async function listNotifications(viewer: UserProfile): Promise<NotificationItem[]> {
@@ -350,6 +377,11 @@ function notificationTargetPath(notification: Omit<NotificationItem, "id" | "cre
   if (notification.relatedEntityType === "user") return "/admin/users";
   if (notification.relatedEntityType === "commission") {
     return role === "admin" ? "/admin/commissions" : "/marketer/commissions";
+  }
+  if (notification.relatedEntityType === "warrantyReturn" && entityId) {
+    if (role === "admin") return `/admin/returns/${entityId}`;
+    if (role === "coordinator") return `/coordinator/returns/${entityId}`;
+    return `/marketer/returns/${entityId}`;
   }
   if (notification.type === "TARGET_UPDATED") return role === "admin" ? "/admin/targets" : "/marketer/target";
   if (notification.type === "EXPENSE_CREATED") return "/admin/expenses";

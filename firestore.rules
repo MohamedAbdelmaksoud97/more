@@ -20,6 +20,7 @@ service cloud.firestore {
     // fcmTokens/{tokenId}: token, userId, role, updatedAt.
     // imageRequests/{requestId}: productId, requesterId, status, notes.
     // scrapReports/{scrapId}: orderId, marketerId, status, value, notes.
+    // warrantyReturns/{returnId}: warranty replacement flow; server-written only.
     // audit_logs/{logId}: server-written audit trail; clients cannot write.
     //
     // ===============================================================
@@ -188,6 +189,8 @@ service cloud.firestore {
           'selectedLocation',
           'finalPrice',
           'discount',
+          'warrantyMonths',
+          'warrantyEndsAt',
           'payment',
           'scrap',
           'status',
@@ -220,6 +223,8 @@ service cloud.firestore {
         data.selectedLocation in ['SHOWROOM', 'WAREHOUSE', 'SUPPLIER_DIRECT'] &&
         data.finalPrice is number &&
         data.finalPrice > 0 &&
+        (!(data.warrantyMonths is number) || (data.warrantyMonths >= 1 && data.warrantyMonths <= 120)) &&
+        (!(data.warrantyEndsAt is string) || data.warrantyEndsAt.size() <= 40) &&
         validOrderStatus(data.status) &&
         data.marketerId is string &&
         data.isPaymentCollected is bool &&
@@ -351,6 +356,11 @@ service cloud.firestore {
       allow read: if isAdmin() || isCoordinator() || (isMarketer() && resource.data.marketerId == request.auth.uid);
       allow create: if isMarketer() && request.resource.data.marketerId == request.auth.uid;
       allow update, delete: if isAdmin() || isCoordinator();
+    }
+
+    match /warrantyReturns/{returnId} {
+      allow read: if isAdmin() || isCoordinator() || (isMarketer() && resource.data.marketerId == request.auth.uid);
+      allow create, update, delete: if false;
     }
 
     match /audit_logs/{logId} {
