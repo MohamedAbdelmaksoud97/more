@@ -57,6 +57,7 @@ export function OrderDetailView({
     canReview && ["APPROVED_RESERVED", "PREPARING_SHIPPING", "SHIPPED"].includes(order.status);
   const showFulfillmentForm =
     canConfirmFulfillment && !order.isPaymentCollected && ["SHIPPED", "DELIVERED_PENDING_CONFIRMATION"].includes(order.status);
+  const showPendingEditButton = !canReview && order.status === "PENDING_REVIEW";
   const showEditRequestForm = !canReview && order.status !== "PENDING_REVIEW";
 
   return (
@@ -109,6 +110,17 @@ export function OrderDetailView({
       </div>
 
       <div className="grid gap-6">
+        {showPendingEditButton ? (
+          <Panel title="تعديل الطلب قبل المراجعة">
+            <p className="mb-3 text-sm font-bold leading-6 text-slate-600">
+              الطلب لم يتم اعتماده بعد، لذلك يمكن تعديل بيانات العميل والمنتج والمخزون والدفع مباشرة.
+            </p>
+            <ButtonLink href={`/marketer/orders/${order.id}/edit`} variant="secondary" className="w-full">
+              فتح شاشة تعديل الطلب
+            </ButtonLink>
+          </Panel>
+        ) : null}
+
         {showEditRequestForm ? (
           <Panel title="طلب تعديل على الأوردر">
             <form action={requestOrderEditFormAction} className="grid gap-3">

@@ -453,7 +453,6 @@ export async function confirmWarrantyFulfillmentAction(
       relatedEntityId: item.id,
       requiresAction: false,
     },
-    { mirrorToAdmin: false },
   );
   revalidateReturnPaths(item.id);
   revalidatePath("/admin/inventory");

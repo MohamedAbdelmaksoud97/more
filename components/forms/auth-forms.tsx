@@ -151,7 +151,6 @@ export function RegisterForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [nationalIdFile, setNationalIdFile] = useState<File | null>(null);
-  const [addressProofFile, setAddressProofFile] = useState<File | null>(null);
 
   async function uploadRegistrationFile(file: File, idToken: string) {
     if (!file.type.match(/^(image\/(png|jpeg|jpg|webp)|application\/pdf)$/)) {
@@ -193,21 +192,18 @@ export function RegisterForm() {
     };
 
     try {
-      if (!nationalIdFile || !addressProofFile) {
-        throw new Error("ارفع صورة البطاقة وصورة إثبات العنوان قبل التسجيل.");
+      if (!nationalIdFile) {
+        throw new Error("ارفع صورة البطاقة قبل التسجيل.");
       }
       const credential = await createUserWithEmailAndPassword(auth, String(payload.email), String(payload.password));
       await updateProfile(credential.user, { displayName: String(payload.name) });
       await sendVerificationEmail(credential.user);
       const token = await credential.user.getIdToken(true);
-      const [nationalIdImageUrl, addressProofImageUrl] = await Promise.all([
-        uploadRegistrationFile(nationalIdFile, token),
-        uploadRegistrationFile(addressProofFile, token),
-      ]);
+      const nationalIdImageUrl = await uploadRegistrationFile(nationalIdFile, token);
       const response = await fetch("/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ idToken: token, ...payload, nationalIdImageUrl, addressProofImageUrl }),
+        body: JSON.stringify({ idToken: token, ...payload, nationalIdImageUrl }),
       });
       const result = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(result.error ?? "تعذر تسجيل الحساب");
@@ -239,12 +235,6 @@ export function RegisterForm() {
             file={nationalIdFile}
             onFile={setNationalIdFile}
             onClear={() => setNationalIdFile(null)}
-          />
-          <RegistrationFileField
-            label="إثبات العنوان"
-            file={addressProofFile}
-            onFile={setAddressProofFile}
-            onClear={() => setAddressProofFile(null)}
           />
         </div>
       }

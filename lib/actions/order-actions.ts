@@ -233,6 +233,127 @@ export async function createOrderAction(_state: OrderActionState, formData: Form
   }
 }
 
+export async function updatePendingOrderAction(_state: OrderActionState, formData: FormData): Promise<OrderActionState> {
+  try {
+    const user = await requireRole(["marketer"]);
+    const orderId = String(formData.get("orderId") ?? "");
+    const parsed = orderSchema.safeParse(Object.fromEntries(formData.entries()));
+    if (!orderId) return { ok: false, message: "الطلب غير صحيح" };
+    if (!parsed.success) {
+      return { ok: false, message: "راجع بيانات الطلب", errors: parsed.error.flatten().fieldErrors };
+    }
+    if (!hasFirebaseAdminConfig()) return { ok: true, message: "تم تحديث الطلب في وضع العرض التجريبي" };
+
+    const db = getAdminDb();
+    if (!db) return { ok: false, message: "Firebase Admin غير مهيأ" };
+    const orderRef = db.collection("orders").doc(orderId);
+    const orderSnap = await orderRef.get();
+    if (!orderSnap.exists) return { ok: false, message: "الطلب غير موجود" };
+    const current = { id: orderSnap.id, ...orderSnap.data() } as Order;
+    if (current.marketerId !== user.uid) return { ok: false, message: "يمكنك تعديل طلباتك فقط" };
+    if (current.status !== "PENDING_REVIEW") {
+      return { ok: false, message: "بعد اعتماد الطلب يجب إرسال طلب تعديل للمدير أو المنسق" };
+    }
+
+    const productSnap = await db.collection("products").doc(parsed.data.productId).get();
+    if (!productSnap.exists) return { ok: false, message: "المنتج غير موجود" };
+    const product = { id: productSnap.id, ...productSnap.data() } as Product;
+    if (!product.active) return { ok: false, message: "هذا المنتج غير نشط ولا يمكن إنشاء طلب عليه" };
+    const selectedStock = product.stock.find((record) => record.location === parsed.data.selectedLocation);
+    if (!selectedStock) return { ok: false, message: "موقع المخزون غير متاح لهذا المنتج" };
+    if (selectedStock.available < parsed.data.quantity) {
+      return { ok: false, message: `الكمية المتاحة في ${parsed.data.selectedLocation} هي ${selectedStock.available} فقط` };
+    }
+    if (parsed.data.discount >= product.price) {
+      return { ok: false, message: "الخصم لا يمكن أن يساوي أو يتجاوز سعر المنتج" };
+    }
+
+    const finalUnitPrice = product.price - parsed.data.discount;
+    const total = finalUnitPrice * parsed.data.quantity;
+    if (parsed.data.depositAmount > total) {
+      return { ok: false, message: "العربون لا يمكن أن يتجاوز إجمالي الطلب" };
+    }
+
+    const now = new Date();
+    const nowIso = now.toISOString();
+    const update: Partial<Order> = {
+      customer: {
+        customerName: parsed.data.customerName,
+        customerPhone: parsed.data.customerPhone,
+        customerPhones: [parsed.data.customerPhone, parsed.data.customerPhone2, parsed.data.customerPhone3].filter(Boolean) as string[],
+        governorate: parsed.data.governorate,
+        area: parsed.data.area,
+        address: parsed.data.address,
+        notes: parsed.data.notes,
+      },
+      productId: product.id,
+      productName: product.name,
+      quantity: parsed.data.quantity,
+      selectedLocation: parsed.data.selectedLocation,
+      finalPrice: finalUnitPrice,
+      discount: parsed.data.discount,
+      warrantyMonths: parsed.data.warrantyMonths,
+      warrantyEndsAt: addMonths(new Date(current.createdAt), parsed.data.warrantyMonths).toISOString(),
+      payment: {
+        hasDeposit: parsed.data.hasDeposit,
+        depositAmount: parsed.data.depositAmount,
+        depositImageUrl: parsed.data.depositImageUrl,
+        remainingAmount: total - parsed.data.depositAmount,
+        paymentOnDelivery: parsed.data.paymentOnDelivery,
+      },
+      scrap: {
+        hasScrap: parsed.data.hasScrap,
+        scrapType: parsed.data.scrapType,
+        scrapAmpere: parsed.data.scrapAmpere,
+        scrapWeightKg: parsed.data.scrapWeightKg,
+        scrapKiloPrice: parsed.data.scrapKiloPrice,
+        scrapEstimatedValue: parsed.data.scrapEstimatedValue,
+        scrapImageUrl: parsed.data.scrapImageUrl,
+        scrapNotes: parsed.data.scrapNotes,
+        status: parsed.data.hasScrap ? "EXPECTED" : undefined,
+      },
+      updatedAt: nowIso,
+      timeline: [
+        ...(current.timeline ?? []),
+        { label: "تم تعديل الطلب قبل المراجعة", actorName: user.name, at: nowIso },
+      ],
+    };
+
+    await orderRef.update(withoutUndefined(update));
+    await writeAudit({
+      actorUserId: user.uid,
+      actorRole: user.role,
+      action: "order.pending_update",
+      entityType: "order",
+      entityId: orderId,
+      before: withoutUndefined(current),
+      after: withoutUndefined(update),
+    });
+    await createNotification({
+      title: "تم تعديل طلب بانتظار المراجعة",
+      body: `${user.name} عدل طلب ${current.orderNumber ?? orderId} قبل الاعتماد`,
+      type: "ORDER_CREATED",
+      recipientRole: "coordinator",
+      actorUserId: user.uid,
+      actorName: user.name,
+      relatedEntityType: "order",
+      relatedEntityId: orderId,
+      requiresAction: true,
+    });
+
+    revalidatePath(`/marketer/orders/${orderId}`);
+    revalidatePath(`/marketer/orders/${orderId}/edit`);
+    revalidatePath(`/admin/orders/${orderId}`);
+    revalidatePath(`/coordinator/orders/${orderId}`);
+    revalidatePath("/admin/orders");
+    revalidatePath("/coordinator/orders");
+    revalidatePath("/coordinator/orders/pending");
+    return { ok: true, message: "تم تحديث الطلب وهو مازال بانتظار المراجعة" };
+  } catch (error) {
+    return { ok: false, message: error instanceof Error ? error.message : "تعذر تعديل الطلب" };
+  }
+}
+
 export async function approveOrderAction(formData: FormData) {
   const user = await requireRole(["admin", "coordinator"]);
   const parsed = orderDecisionSchema.safeParse({ orderId: formData.get("orderId") });

@@ -1,4 +1,5 @@
 import type { Expense, Order, Product, Target, UserProfile } from "@/lib/types";
+import { redirect } from "next/navigation";
 import { DashboardCard, Panel } from "@/components/ui/cards";
 import { DataTable } from "@/components/ui/table";
 import { formatCurrency, formatDateOnly, formatOrderNumber } from "@/lib/utils";
@@ -116,6 +117,22 @@ export function ReportsView({
     .sort((a, b) => b.sales - a.sales);
 
   const scrapOrders = monthlyFinancialOrders.filter((order) => order.scrap.hasScrap);
+  const statusRows = Object.entries(
+    monthlyOrders.reduce<Record<string, number>>((acc, order) => {
+      acc[order.status] = (acc[order.status] ?? 0) + 1;
+      return acc;
+    }, {}),
+  )
+    .map(([status, count]) => ({ label: orderStatusLabels[status as Order["status"]] ?? status, value: count }))
+    .sort((a, b) => b.value - a.value);
+  const financeRows = [
+    { label: "إجمالي المبيعات", value: totalSales, tone: "blue" as const },
+    { label: "النقدية المحصلة", value: collectedCash, tone: "green" as const },
+    { label: "تكلفة البضاعة", value: costOfGoods, tone: "gray" as const },
+    { label: "المصروفات", value: expenseTotal, tone: "yellow" as const },
+    { label: "العمولات المدفوعة", value: paidCommissions, tone: "blue" as const },
+    { label: "صافي النقدية", value: netCash, tone: "green" as const },
+  ];
   const exportSheets: ExportSheet[] = [
     {
       name: "الملخص",
@@ -162,6 +179,76 @@ export function ReportsView({
         القيمة: expense.amount,
         الملاحظة: expense.note,
         التاريخ: formatDateOnly(expense.createdAt),
+      })),
+    },
+    {
+      name: "المنتجات",
+      rows: productRows.map((row) => ({
+        المنتج: row.product.name,
+        طلبات: row.orders,
+        الكمية: row.quantity,
+        "إجمالي المبيعات": row.sales,
+        متاح: row.available,
+        محجوز: row.reserved,
+        مباع: row.product.stock.reduce((sum, item) => sum + item.sold, 0),
+        مرتجع: row.product.stock.reduce((sum, item) => sum + item.returned, 0),
+      })),
+    },
+    {
+      name: "المنسقين",
+      rows: coordinatorRows.map((row) => ({
+        المستخدم: row.user.name,
+        الدور: row.user.role === "admin" ? "مدير" : "منسق",
+        طلبات: row.orders,
+        مبيعات: row.sales,
+        "نقدية محصلة": row.collected,
+      })),
+    },
+    {
+      name: "العمولات",
+      rows: monthlyFinancialOrders
+        .filter((order) => order.commissionAmount > 0 || order.commissionStatus !== "EXPECTED")
+        .map((order) => ({
+          "رقم الطلب": formatOrderNumber(order),
+          المسوق: order.marketerName,
+          الحالة: commissionStatusLabels[order.commissionStatus],
+          "قيمة العمولة": order.commissionAmount,
+          "قيمة الطلب": orderTotal(order),
+        })),
+    },
+    {
+      name: "الكهنة",
+      rows: scrapOrders.map((order) => ({
+        "رقم الطلب": formatOrderNumber(order),
+        المنتج: order.productName,
+        النوع: order.scrap.scrapType ?? "غير محدد",
+        الوزن: order.scrap.scrapWeightKg ?? 0,
+        "سعر الكيلو": order.scrap.scrapKiloPrice ?? 0,
+        القيمة: order.scrap.confirmedValue ?? order.scrap.scrapEstimatedValue ?? 0,
+        الحالة: orderStatusLabels[order.status],
+      })),
+    },
+    {
+      name: "المخزون",
+      rows: products.flatMap((product) =>
+        product.stock.map((item) => ({
+          المنتج: product.name,
+          الموقع: locationLabels[item.location],
+          متاح: item.available,
+          محجوز: item.reserved,
+          مباع: item.sold,
+          مرتجع: item.returned,
+        })),
+      ),
+    },
+    {
+      name: "التارجت",
+      rows: monthlyTargets.map((target) => ({
+        المسوق: target.marketerName,
+        الشهر: `${target.month}/${target.year}`,
+        الهدف: target.targetAmount,
+        المحقق: target.achievedAmount,
+        المتبقي: target.remainingAmount,
       })),
     },
   ];
@@ -252,6 +339,15 @@ export function ReportsView({
         </Panel>
         <Panel title="رسم المبيعات حسب المنتج">
           <BarList rows={productRows.slice(0, 8).map((row) => ({ label: row.product.name, value: row.sales }))} />
+        </Panel>
+      </div>
+
+      <div className="grid gap-6 xl:grid-cols-[0.85fr_1.15fr]">
+        <Panel title="توزيع حالات الطلبات" description="يعرض حركة الطلبات المنشأة خلال الشهر حسب الحالة الحالية.">
+          <DonutChart rows={statusRows} />
+        </Panel>
+        <Panel title="الخريطة المالية للشهر" description="مقارنة سريعة بين المبيعات والتحصيل والتكاليف والمصروفات والعمولات.">
+          <FinanceBars rows={financeRows} />
         </Panel>
       </div>
 
@@ -487,6 +583,85 @@ function BarList({ rows }: { rows: Array<{ label: string; value: number }> }) {
   );
 }
 
+function DonutChart({ rows }: { rows: Array<{ label: string; value: number }> }) {
+  const total = rows.reduce((sum, row) => sum + row.value, 0);
+  const colors = ["#2563eb", "#10b981", "#f59e0b", "#64748b", "#ef4444", "#8b5cf6", "#06b6d4"];
+  let current = 0;
+  const gradient = rows.length
+    ? rows
+        .map((row, index) => {
+          const start = current;
+          const size = total ? (row.value / total) * 100 : 0;
+          current += size;
+          return `${colors[index % colors.length]} ${start}% ${current}%`;
+        })
+        .join(", ")
+    : "#e2e8f0 0% 100%";
+
+  if (!rows.length) {
+    return <p className="rounded-lg border border-dashed border-slate-200 bg-slate-50 p-6 text-center text-sm font-bold text-slate-500">لا توجد طلبات في هذا الشهر.</p>;
+  }
+
+  return (
+    <div className="grid gap-5 md:grid-cols-[180px_minmax(0,1fr)] md:items-center">
+      <div
+        className="mx-auto grid size-44 place-items-center rounded-full"
+        style={{ background: `conic-gradient(${gradient})` }}
+        aria-label="توزيع حالات الطلبات"
+      >
+        <div className="grid size-24 place-items-center rounded-full bg-white text-center shadow-inner">
+          <span className="text-2xl font-black text-slate-950">{total}</span>
+          <span className="-mt-5 text-xs font-bold text-slate-500">طلب</span>
+        </div>
+      </div>
+      <div className="grid gap-2">
+        {rows.map((row, index) => (
+          <div key={row.label} className="flex items-center justify-between gap-3 rounded-md border border-slate-100 bg-slate-50 px-3 py-2 text-sm font-bold">
+            <span className="flex min-w-0 items-center gap-2">
+              <span className="size-3 shrink-0 rounded-full" style={{ backgroundColor: colors[index % colors.length] }} />
+              <span className="truncate text-slate-700">{row.label}</span>
+            </span>
+            <span className="shrink-0 text-slate-950">{row.value}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function FinanceBars({
+  rows,
+}: {
+  rows: Array<{ label: string; value: number; tone: "blue" | "green" | "yellow" | "gray" }>;
+}) {
+  const max = Math.max(1, ...rows.map((row) => Math.abs(row.value)));
+  const colors = {
+    blue: "bg-blue-600",
+    green: "bg-emerald-600",
+    yellow: "bg-amber-500",
+    gray: "bg-slate-500",
+  };
+
+  return (
+    <div className="grid gap-3">
+      {rows.map((row) => {
+        const width = Math.max(4, Math.round((Math.abs(row.value) / max) * 100));
+        return (
+          <div key={row.label} className="rounded-lg border border-slate-100 bg-white p-3">
+            <div className="mb-2 flex items-center justify-between gap-3 text-sm font-bold">
+              <span className="text-slate-600">{row.label}</span>
+              <span className="text-slate-950">{formatCurrency(row.value)}</span>
+            </div>
+            <div className="h-3 overflow-hidden rounded-full bg-slate-100">
+              <div className={`h-full rounded-full ${colors[row.tone]}`} style={{ width: `${width}%` }} />
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 const statusLabels: Record<string, string> = {
   PENDING_EMAIL_VERIFICATION: "بانتظار تأكيد البريد",
   PENDING_ADMIN_APPROVAL: "بانتظار اعتماد المدير",
@@ -513,11 +688,12 @@ const statusOptions = [
 async function updateUserRoleFormAction(formData: FormData) {
   "use server";
   await updateUserRoleAction(formData);
+  redirect("/admin/users");
 }
 
 export function UsersView({ users, currentUserId }: { users: UserProfile[]; currentUserId?: string }) {
   return (
-    <DataTable headers={["الاسم", "البريد", "الهاتف", "العنوان", "البطاقة", "إثبات العنوان", "الدور", "الحالة", "الإجراء"]}>
+    <DataTable headers={["الاسم", "البريد", "الهاتف", "العنوان", "صورة البطاقة", "الدور", "الحالة", "الإجراء"]}>
       {users.map((user) => (
         <tr key={user.uid}>
           <td className="px-4 py-3 font-bold">{user.name}</td>
@@ -526,9 +702,6 @@ export function UsersView({ users, currentUserId }: { users: UserProfile[]; curr
           <td className="px-4 py-3">{user.address ?? "غير مسجل"}</td>
           <td className="px-4 py-3">
             {user.nationalIdImageUrl ? <a className="font-bold text-blue-700 hover:underline" href={user.nationalIdImageUrl} target="_blank" rel="noreferrer">فتح</a> : "غير مرفوع"}
-          </td>
-          <td className="px-4 py-3">
-            {user.addressProofImageUrl ? <a className="font-bold text-blue-700 hover:underline" href={user.addressProofImageUrl} target="_blank" rel="noreferrer">فتح</a> : "غير مرفوع"}
           </td>
           <td className="px-4 py-3">{user.role}</td>
           <td className="px-4 py-3">{statusLabels[user.status] ?? user.status}</td>

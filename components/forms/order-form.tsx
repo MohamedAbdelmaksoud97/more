@@ -2,8 +2,8 @@
 
 import { useActionState, useMemo, useState } from "react";
 import { CheckCircle2, UploadCloud, X } from "lucide-react";
-import type { InventoryLocation, Product } from "@/lib/types";
-import { createOrderAction, type OrderActionState } from "@/lib/actions/order-actions";
+import type { InventoryLocation, Order, Product } from "@/lib/types";
+import { createOrderAction, updatePendingOrderAction, type OrderActionState } from "@/lib/actions/order-actions";
 import { Button } from "@/components/ui/button";
 import { Field, Input, Select, Textarea } from "@/components/ui/form";
 import { locationLabels } from "@/lib/constants";
@@ -12,19 +12,28 @@ import { formatCurrency } from "@/lib/utils";
 const initialState: OrderActionState = { ok: false, message: "" };
 type UploadFolder = "deposits" | "scrap";
 
-export function OrderForm({ products, selectedProductId }: { products: Product[]; selectedProductId?: string }) {
-  const [state, action, pending] = useActionState(createOrderAction, initialState);
-  const [productId, setProductId] = useState(selectedProductId ?? "");
-  const [selectedLocation, setSelectedLocation] = useState<InventoryLocation | "">("");
-  const [quantity, setQuantity] = useState(1);
-  const [discount, setDiscount] = useState(0);
-  const [warrantyMonths, setWarrantyMonths] = useState(12);
-  const [depositAmount, setDepositAmount] = useState(0);
-  const [scrapWeightKg, setScrapWeightKg] = useState(0);
-  const [scrapKiloPrice, setScrapKiloPrice] = useState(0);
-  const [scrapEstimatedValue, setScrapEstimatedValue] = useState(0);
-  const [depositImageUrl, setDepositImageUrl] = useState("");
-  const [scrapImageUrl, setScrapImageUrl] = useState("");
+export function OrderForm({
+  products,
+  selectedProductId,
+  initialOrder,
+}: {
+  products: Product[];
+  selectedProductId?: string;
+  initialOrder?: Order;
+}) {
+  const isEditing = Boolean(initialOrder);
+  const [state, action, pending] = useActionState(isEditing ? updatePendingOrderAction : createOrderAction, initialState);
+  const [productId, setProductId] = useState(selectedProductId ?? initialOrder?.productId ?? "");
+  const [selectedLocation, setSelectedLocation] = useState<InventoryLocation | "">(initialOrder?.selectedLocation ?? "");
+  const [quantity, setQuantity] = useState(initialOrder?.quantity ?? 1);
+  const [discount, setDiscount] = useState(initialOrder?.discount ?? 0);
+  const [warrantyMonths, setWarrantyMonths] = useState(initialOrder?.warrantyMonths ?? 12);
+  const [depositAmount, setDepositAmount] = useState(initialOrder?.payment.depositAmount ?? 0);
+  const [scrapWeightKg, setScrapWeightKg] = useState(initialOrder?.scrap.scrapWeightKg ?? 0);
+  const [scrapKiloPrice, setScrapKiloPrice] = useState(initialOrder?.scrap.scrapKiloPrice ?? 0);
+  const [scrapEstimatedValue, setScrapEstimatedValue] = useState(initialOrder?.scrap.scrapEstimatedValue ?? 0);
+  const [depositImageUrl, setDepositImageUrl] = useState(initialOrder?.payment.depositImageUrl ?? "");
+  const [scrapImageUrl, setScrapImageUrl] = useState(initialOrder?.scrap.scrapImageUrl ?? "");
   const [depositUploading, setDepositUploading] = useState(false);
   const [scrapUploading, setScrapUploading] = useState(false);
   const [depositUploadError, setDepositUploadError] = useState("");
@@ -86,32 +95,33 @@ export function OrderForm({ products, selectedProductId }: { products: Product[]
 
   return (
     <form action={action} className="grid min-w-0 gap-5 rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
+      {initialOrder ? <input type="hidden" name="orderId" value={initialOrder.id} /> : null}
       <section className="grid min-w-0 gap-4 md:grid-cols-2">
         <Field label="اسم العميل" error={state.errors?.customerName}>
-          <Input name="customerName" required />
+          <Input name="customerName" defaultValue={initialOrder?.customer.customerName} required />
         </Field>
         <Field label="هاتف العميل" error={state.errors?.customerPhone}>
-          <Input name="customerPhone" required inputMode="numeric" pattern="[0-9]{8,20}" placeholder="01000000000" />
+          <Input name="customerPhone" defaultValue={initialOrder?.customer.customerPhone} required inputMode="numeric" pattern="[0-9]{8,20}" placeholder="01000000000" />
         </Field>
         <Field label="هاتف إضافي">
-          <Input name="customerPhone2" inputMode="numeric" pattern="[0-9]{8,20}" placeholder="اختياري" />
+          <Input name="customerPhone2" defaultValue={initialOrder?.customer.customerPhones?.[1]} inputMode="numeric" pattern="[0-9]{8,20}" placeholder="اختياري" />
         </Field>
         <Field label="هاتف إضافي آخر">
-          <Input name="customerPhone3" inputMode="numeric" pattern="[0-9]{8,20}" placeholder="اختياري" />
+          <Input name="customerPhone3" defaultValue={initialOrder?.customer.customerPhones?.[2]} inputMode="numeric" pattern="[0-9]{8,20}" placeholder="اختياري" />
         </Field>
         <Field label="المحافظة" error={state.errors?.governorate}>
-          <Input name="governorate" required />
+          <Input name="governorate" defaultValue={initialOrder?.customer.governorate} required />
         </Field>
         <Field label="المنطقة" error={state.errors?.area}>
-          <Input name="area" required />
+          <Input name="area" defaultValue={initialOrder?.customer.area} required />
         </Field>
       </section>
 
       <Field label="العنوان" error={state.errors?.address}>
-        <Textarea name="address" required />
+        <Textarea name="address" defaultValue={initialOrder?.customer.address} required />
       </Field>
       <Field label="ملاحظات">
-        <Textarea name="notes" />
+        <Textarea name="notes" defaultValue={initialOrder?.customer.notes} />
       </Field>
 
       <section className="rounded-lg border border-slate-200 bg-slate-50 p-4">
@@ -209,7 +219,7 @@ export function OrderForm({ products, selectedProductId }: { products: Product[]
           />
         </Field>
         <label className="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-semibold text-slate-700 md:mt-7">
-          <input type="checkbox" name="hasDeposit" value="true" className="size-4 accent-blue-700" />
+          <input type="checkbox" name="hasDeposit" value="true" defaultChecked={initialOrder?.payment.hasDeposit ?? false} className="size-4 accent-blue-700" />
           يوجد عربون
         </label>
       </section>
@@ -239,15 +249,15 @@ export function OrderForm({ products, selectedProductId }: { products: Product[]
 
       <section className="rounded-lg bg-slate-50 p-4">
         <label className="mb-3 flex items-center gap-2 text-sm font-bold text-slate-800">
-          <input type="checkbox" name="hasScrap" value="true" className="size-4 accent-blue-700" />
+          <input type="checkbox" name="hasScrap" value="true" defaultChecked={initialOrder?.scrap.hasScrap ?? false} className="size-4 accent-blue-700" />
           يوجد بطارية كهنة
         </label>
         <div className="grid min-w-0 gap-4 md:grid-cols-3">
           <Field label="نوع الكهنة">
-            <Input name="scrapType" />
+            <Input name="scrapType" defaultValue={initialOrder?.scrap.scrapType} />
           </Field>
           <Field label="الأمبير">
-            <Input name="scrapAmpere" type="number" min={0} />
+            <Input name="scrapAmpere" type="number" min={0} defaultValue={initialOrder?.scrap.scrapAmpere} />
           </Field>
           <Field label="وزن الكهنة بالكيلو">
             <Input
@@ -290,7 +300,7 @@ export function OrderForm({ products, selectedProductId }: { products: Product[]
         </div>
         <div className="mt-4">
           <Field label="ملاحظات الكهنة">
-            <Textarea name="scrapNotes" />
+            <Textarea name="scrapNotes" defaultValue={initialOrder?.scrap.scrapNotes} />
           </Field>
         </div>
       </section>
@@ -321,7 +331,7 @@ export function OrderForm({ products, selectedProductId }: { products: Product[]
           className="h-11 min-w-44"
           disabled={!selectedProduct || availableLocations.length === 0 || isUploading}
         >
-          إرسال الطلب للمراجعة
+          {isEditing ? "حفظ تعديلات الطلب" : "إرسال الطلب للمراجعة"}
         </Button>
       </div>
     </form>
