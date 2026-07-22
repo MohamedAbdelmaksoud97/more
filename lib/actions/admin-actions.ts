@@ -84,6 +84,95 @@ export async function updateUserRoleAction(formData: FormData) {
   return { ok: true, message: "تم تحديث المستخدم" };
 }
 
+async function deleteQueryDocuments(query: FirebaseFirestore.Query) {
+  let deleted = 0;
+
+  while (true) {
+    const snap = await query.limit(450).get();
+    if (snap.empty) break;
+
+    const batch = snap.docs[0].ref.firestore.batch();
+    snap.docs.forEach((doc) => batch.delete(doc.ref));
+    await batch.commit();
+    deleted += snap.size;
+  }
+
+  return deleted;
+}
+
+export async function deleteUserAction(uid: string): Promise<ActionState> {
+  try {
+    const actor = await requireRole(["admin"]);
+    const targetUid = String(uid ?? "").trim();
+    if (!targetUid) return { ok: false, message: "المستخدم غير صحيح" };
+    if (targetUid === actor.uid) return { ok: false, message: "لا يمكن حذف حسابك الحالي" };
+    if (!hasFirebaseAdminConfig()) return { ok: true, message: "تم حذف المستخدم في وضع العرض التجريبي" };
+
+    const db = getAdminDb();
+    const auth = getAdminAuth();
+    if (!db || !auth) return { ok: false, message: "Firebase Admin غير مهيأ" };
+
+    const userRef = db.collection("users").doc(targetUid);
+    const before = await userRef.get();
+    if (!before.exists) return { ok: false, message: "المستخدم غير موجود في قاعدة البيانات" };
+
+    const [
+      deletedFcmTokens,
+      deletedRecipientNotifications,
+      deletedActorNotifications,
+      deletedTargets,
+      deletedCommissions,
+      deletedImageRequests,
+      deletedEditRequests,
+    ] = await Promise.all([
+      deleteQueryDocuments(db.collection("fcmTokens").where("userId", "==", targetUid)),
+      deleteQueryDocuments(db.collection("notifications").where("recipientUserId", "==", targetUid)),
+      deleteQueryDocuments(db.collection("notifications").where("actorUserId", "==", targetUid)),
+      deleteQueryDocuments(db.collection("targets").where("marketerId", "==", targetUid)),
+      deleteQueryDocuments(db.collection("commissions").where("marketerId", "==", targetUid)),
+      deleteQueryDocuments(db.collection("imageRequests").where("requesterId", "==", targetUid)),
+      deleteQueryDocuments(db.collection("orderEditRequests").where("marketerId", "==", targetUid)),
+    ]);
+
+    await userRef.delete();
+    try {
+      await auth.deleteUser(targetUid);
+    } catch (error) {
+      const code = (error as { code?: string }).code;
+      if (code !== "auth/user-not-found") throw error;
+    }
+
+    await writeAudit({
+      actorUserId: actor.uid,
+      actorRole: actor.role,
+      action: "user.delete",
+      entityType: "user",
+      entityId: targetUid,
+      before: withoutUndefined(before.data()),
+      after: {
+        deletedUserDoc: true,
+        deletedAuthUser: true,
+        deletedFcmTokens,
+        deletedRecipientNotifications,
+        deletedActorNotifications,
+        deletedTargets,
+        deletedCommissions,
+        deletedImageRequests,
+        deletedEditRequests,
+      },
+    });
+
+    revalidatePath("/admin/users");
+    revalidatePath("/admin/targets");
+    revalidatePath("/admin/commissions");
+    revalidatePath("/admin/notifications");
+    revalidatePath("/notifications");
+    return { ok: true, message: "تم حذف المستخدم من النظام" };
+  } catch (error) {
+    return { ok: false, message: error instanceof Error ? error.message : "تعذر حذف المستخدم" };
+  }
+}
+
 export async function createExpenseAction(_state: ActionState, formData: FormData): Promise<ActionState> {
   try {
     const actor = await requireRole(["admin", "coordinator"]);

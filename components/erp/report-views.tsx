@@ -7,6 +7,7 @@ import { updateUserRoleAction } from "@/lib/actions/admin-actions";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { commissionStatusLabels, locationLabels, orderStatusLabels } from "@/lib/constants";
 import { ReportExportButton, type ExportSheet } from "@/components/erp/report-export-button";
+import { DeleteUserButton } from "@/components/erp/delete-user-button";
 
 export function ReportsView({
   orders,
@@ -709,28 +710,31 @@ export function UsersView({ users, currentUserId }: { users: UserProfile[]; curr
             {user.uid === currentUserId ? (
               <span className="text-xs font-bold text-slate-400">حسابك الحالي</span>
             ) : (
-              <form action={updateUserRoleFormAction} className="flex min-w-[340px] items-center gap-2">
-                <input type="hidden" name="uid" value={user.uid} />
-                <select
-                  name="role"
-                  defaultValue={user.role}
-                  className="h-9 rounded-lg border border-slate-200 bg-white px-2 text-xs font-bold"
-                >
-                  {roleOptions.map((option) => (
-                    <option key={option.value} value={option.value}>{option.label}</option>
-                  ))}
-                </select>
-                <select
-                  name="status"
-                  defaultValue={user.status}
-                  className="h-9 rounded-lg border border-slate-200 bg-white px-2 text-xs font-bold"
-                >
-                  {statusOptions.map((option) => (
-                    <option key={option.value} value={option.value}>{option.label}</option>
-                  ))}
-                </select>
-                <Button type="submit" className="h-9 px-3 text-xs">حفظ</Button>
-              </form>
+              <div className="flex min-w-[430px] flex-wrap items-center gap-2">
+                <form action={updateUserRoleFormAction} className="flex items-center gap-2">
+                  <input type="hidden" name="uid" value={user.uid} />
+                  <select
+                    name="role"
+                    defaultValue={user.role}
+                    className="h-9 rounded-lg border border-slate-200 bg-white px-2 text-xs font-bold"
+                  >
+                    {roleOptions.map((option) => (
+                      <option key={option.value} value={option.value}>{option.label}</option>
+                    ))}
+                  </select>
+                  <select
+                    name="status"
+                    defaultValue={user.status}
+                    className="h-9 rounded-lg border border-slate-200 bg-white px-2 text-xs font-bold"
+                  >
+                    {statusOptions.map((option) => (
+                      <option key={option.value} value={option.value}>{option.label}</option>
+                    ))}
+                  </select>
+                  <Button type="submit" className="h-9 px-3 text-xs">حفظ</Button>
+                </form>
+                <DeleteUserButton uid={user.uid} name={user.name} />
+              </div>
             )}
           </td>
         </tr>
